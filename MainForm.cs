@@ -17,14 +17,14 @@ using Emgu.CV.UI;
 
 namespace TugasAkhir
 {
-    public partial class Form1 : Form
+    public partial class Form1 : MetroFramework.Forms.MetroForm
     {
         public Form1()
         {
             InitializeComponent();
 
             Image<Gray, Byte> My_Image = new Image<Gray, byte>(@"E:\Data\Project\TA\App\TugasAkhir\TugasAkhir\mdb006.pgm");
-            imageBox1.SizeMode = PictureBoxSizeMode.Zoom;
+            //imageBox1.SizeMode = PictureBoxSizeMode.Zoom;
 
             My_Image = My_Image.SmoothGaussian(7);
 
@@ -109,10 +109,24 @@ namespace TugasAkhir
             product = productTemp.ConvertScale<Byte>(1.0f / 65025.0f * 255, 0);
             productTemp.Dispose();
 
-            imageBox1.Image = product;
+            //imageBox1.Image = product;
 
 
         
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void metroButton1_Click(object sender, EventArgs e)
+        {
+            PelatihanForm pelatihan = new PelatihanForm();
+            pelatihan.Tag = this;
+            pelatihan.Show(this);
+            //HiddenForms.Add(this);
+            Hide();
         }
     }
 }

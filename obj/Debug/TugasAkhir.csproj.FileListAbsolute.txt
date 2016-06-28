@@ -20,3 +20,7 @@ E:\Data\Project\TA\App\TugasAkhir\TugasAkhir\bin\Debug\ZedGraph.xml
 E:\Data\Project\TA\App\TugasAkhir\TugasAkhir\bin\Debug\zh-CN\Emgu.CV.UI.resources.dll
 E:\Data\Project\TA\App\TugasAkhir\TugasAkhir\bin\Debug\zh-CN\ZedGraph.resources.dll
 E:\Data\Project\TA\App\TugasAkhir\TugasAkhir\obj\Debug\TugasAkhir.Form1.resources
+E:\Data\Project\TA\App\TugasAkhir\TugasAkhir\bin\Debug\MetroFramework.Design.dll
+E:\Data\Project\TA\App\TugasAkhir\TugasAkhir\bin\Debug\MetroFramework.dll
+E:\Data\Project\TA\App\TugasAkhir\TugasAkhir\bin\Debug\MetroFramework.Fonts.dll
+E:\Data\Project\TA\App\TugasAkhir\TugasAkhir\obj\Debug\TugasAkhir.PelatihanForm.resources
