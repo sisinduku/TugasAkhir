@@ -56,9 +56,11 @@ namespace TugasAkhir
                 }
                 else {
                     Image<Gray, Byte> My_Image = new Image<Gray, byte>(@paths[i-1]);
+                    Image<Gray, Byte> CLAHEImage = My_Image;
+                    CvInvoke.CLAHE(My_Image, 40, new Size(8, 8), CLAHEImage);
                     String fullFileName = paths[i - 1].Split('\\', '/').Last();
                     String fileName = fullFileName.Split('.').First();                    
-                    listImage.Add(fileName, My_Image);
+                    listImage.Add(fileName, CLAHEImage);
 
                     int percentComplete = (int)((float)i / (float)totalImageCount * 100);
                     if (percentComplete > highestPercentageReached)
@@ -190,8 +192,9 @@ namespace TugasAkhir
         ArrayList loadROI(String paths, BackgroundWorker worker, DoWorkEventArgs e) {
             string line;
             string[] elements;
-            ArrayList result = new ArrayList();            
-            int totalImageCount = 119;
+            ArrayList result = new ArrayList();
+            //int totalImageCount = 119;
+            int totalImageCount = File.ReadLines(paths).Count();
             int i = 1;
             int highestPercentageReached = 0;
 
@@ -267,14 +270,16 @@ namespace TugasAkhir
                     int radius = (int)row[3];
 
                     Image<Gray, Byte> newImage = My_Image.Copy(new Rectangle(x, y, radius, radius));
-                    //image.Add(elements[0], newImage);
+                    
                     container.Add(row[0]);
+                    container.Add(row[3]);
                     container.Add(newImage);
                     roiImage.Add(container);
                 }
                 Console.WriteLine(roiImage.Count);
-                ArrayList test = (ArrayList)roiImage[3];
-                imageBox1.Image = (Image<Gray, Byte>)test[1];
+                ArrayList test = (ArrayList)roiImage[10];
+                imageBox1.SizeMode = PictureBoxSizeMode.Zoom;
+                imageBox1.Image = (Image<Gray, Byte>)test[2];
                 Console.WriteLine(test[0]);
             }
         }
