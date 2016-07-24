@@ -42,7 +42,7 @@ namespace TugasAkhir
                 }
             }
             int[,] totalEnergy = zeros; // Total weighted phase congruency values (energy).
-            int[,] totalSumAn = zeros; // Total filter response amplitude values.
+            int[,] totalSumAn = zeros;  // Total filter response amplitude values.
             int[,] orientation = zeros; // Matrix storing orientation with greatest
                                         // energy for each pixel.
 
@@ -59,9 +59,52 @@ namespace TugasAkhir
             // Set up X and Y matrices with ranges normalised to +/- 0.5
             // The following code adjusts things appropriately for odd and even values
             // of rows and columns.
-            if (width % 2 == 1) {
+            double[] xrange = Utillity.createArray(width);
+            double[] yrange = Utillity.createArray(height);
 
-            }
+            Matrix<double> newXrange = new Matrix<double>(xrange);
+            newXrange = newXrange.Transpose();
+            Matrix<double> x = new Matrix<double>(height, width);
+
+            Matrix<double> newYrange = new Matrix<double>(yrange);
+            newYrange = newYrange.Transpose();
+            Matrix<double> y = new Matrix<double>(height, width);
+
+            CvInvoke.Repeat(newXrange.Reshape(1,1), newXrange.Cols, 1, x);
+            CvInvoke.Repeat(newYrange.Reshape(1, 1).Transpose(), 1, newXrange.Cols, y);
+
+            int baris = height / 2 + 1;
+            int kolom = width / 2 + 1;
+            Matrix<double> multX = Utillity.power(x, 2);
+            Matrix<double> multY = Utillity.power(y, 2);
+            Matrix<double> radius = Utillity.square(multX.Add(multY)); // Matrix values contain *normalised* radius from centre.
+            radius.Data[baris, kolom] = 1; // Get rid of the 0 radius value in the middle 
+                                           // so that taking the log of the radius will 
+                                           // not cause trouble.
+            Matrix<double> theta = Utillity.atanMinY(y,x); // Matrix values contain polar angle.
+            radius = Utillity.ifftshift(radius);    // Quadrant shift radius and theta so that filters
+            theta = Utillity.ifftshift(theta);      // are constructed with 0 frequency at the corners.
+
+            Matrix<double> sintheta = Utillity.sin(theta);
+            Matrix<double> costheta = Utillity.cos(theta);
+            x.Dispose(); y.Dispose(); theta.Dispose();
+
+            /* Filters are constructed in terms of two components.
+            * 1) The radial component, which controls the frequency band that the filter
+            * responds to
+            * 2) The angular component, which controls the orientation that the filter
+            * responds to.
+            * The two components are multiplied together to construct the overall filter.
+
+            * Construct the radial filter components...
+
+            * First construct a low - pass filter that is as large as possible, yet falls
+            * away to zero at the boundaries.All log Gabor filters are multiplied by
+            * this to ensure no extra frequencies at the 'corners' of the FFT are
+            * incorporated as this seems to upset the normalisation process when
+            * calculating phase congrunecy. */
+            Matrix<double> lp = Utillity.lowpassfilter(height, width, 0.45f, 15);
+
             return result;
         }
 

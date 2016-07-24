@@ -73,6 +73,7 @@
   <ItemGroup>
     <Compile Include="BHEA.cs" />
     <Compile Include="DBConnect.cs" />
+    <Compile Include="GaborWavelet.cs" />
     <Compile Include="PelatihanForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -87,6 +88,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utillity.cs" />
     <EmbeddedResource Include="PelatihanForm.resx">
       <DependentUpon>PelatihanForm.cs</DependentUpon>
     </EmbeddedResource>
