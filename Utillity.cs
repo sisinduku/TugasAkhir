@@ -54,11 +54,139 @@ namespace TugasAkhir
             return result;
         }
 
+        public static Matrix<double> div(Matrix<double> array, double div)
+        {
+            Matrix<double> result = array.Clone();
+            for (int i = 0; i < array.Rows; i++)
+                for (int j = 0; j < array.Cols; j++)
+                    result.Data[i, j] = array.Data[i, j]/div;
+
+            return result;
+        }
+
+        public static Matrix<double> multArray(Matrix<double> array, Matrix<double> mult)
+        {
+            Matrix<double> result = array.Clone();
+            for (int i = 0; i < array.Rows; i++)
+                for (int j = 0; j < array.Cols; j++)
+                    result.Data[i, j] = array.Data[i, j] * mult.Data[i, j];
+
+            return result;
+        }
+
+        public static Matrix<double> log(Matrix<double> array)
+        {
+            Matrix<double> result = array.Clone();
+            for (int i = 0; i < array.Rows; i++)
+                for (int j = 0; j < array.Cols; j++)
+                    result.Data[i, j] = Math.Log(array.Data[i, j]);
+
+            return result;
+        }
+
+        public static Matrix<double> exp(Matrix<double> array)
+        {
+            Matrix<double> result = array.Clone();
+            for (int i = 0; i < array.Rows; i++)
+                for (int j = 0; j < array.Cols; j++)
+                    result.Data[i, j] = Math.Exp(array.Data[i, j]);
+
+            return result;
+        }
+
+        public static Matrix<double> min(Matrix<double> array, double value)
+        {
+            Matrix<double> result = array.Clone();
+            for (int i = 0; i < array.Rows; i++)
+                for (int j = 0; j < array.Cols; j++)
+                    result.Data[i, j] = value - array.Data[i, j];
+
+            return result;
+        }
+
+        public static Matrix<double> abs(Matrix<double> array)
+        {
+            Matrix<double> result = array.Clone();
+            for (int i = 0; i < array.Rows; i++)
+                for (int j = 0; j < array.Cols; j++)
+                    result.Data[i, j] = Math.Abs(array.Data[i, j]);
+
+            return result;
+        }
+
+        public static Matrix<double> round(Matrix<double> array)
+        {
+            Matrix<double> result = array.Clone();
+            for (int i = 0; i < array.Rows; i++)
+                for (int j = 0; j < array.Cols; j++)
+                    result.Data[i, j] = Math.Round(array.Data[i, j]);
+
+            return result;
+        }
+
+        public static Matrix<double> neg(Matrix<double> array)
+        {
+            Matrix<double> result = array.Clone();
+            for (int i = 0; i < array.Rows; i++)
+                for (int j = 0; j < array.Cols; j++)
+                    result.Data[i, j] = (array.Data[i, j] < 0)?1:0;
+
+            return result;
+        }
+
+        public static Matrix<double> negasi(Matrix<double> array)
+        {
+            Matrix<double> result = array.Clone();
+            for (int i = 0; i < array.Rows; i++)
+                for (int j = 0; j < array.Cols; j++)
+                    result.Data[i, j] = (array.Data[i, j] == 0) ? 1 : 0;
+
+            return result;
+        }
+
+        public static double median(Matrix<double> array) {
+            double med = -1.0;
+            double m = (array.Rows * array.Cols) / 2;
+            int bin = 0;
+
+            int histSize = 256;
+            int[] histSizeArr = new int[] { histSize };
+            float[] range = new float[]{ 0, 256 };
+            bool uniform = true;
+            bool accumulate = false;
+            Matrix<double> hist = new Matrix<double>(0, 255);
+            CvInvoke.CalcHist(array, new int[] { 0 }, new Mat(), hist, histSizeArr, range, accumulate);
+            for (int i = 0; i < histSize && med < 0.0; ++i) {
+                bin += Convert.ToInt32(Math.Round(hist.Data[0, i]));
+                if (bin > m && med < 0.0)
+                    med = i;
+            }
+
+            return med;
+        }
+
         public static Matrix<double> atanMinY(Matrix<double> y, Matrix<double> x) {
             Matrix<double> result = y.Clone();
-            for (int i = 0; i < result.Rows; i++)
-                for (int j = 0; j < result.Cols; j++)
-                    result.Data[i, j] = Math.Atan2(-y.Data[i,j], x.Data[i,j]);
+            for (int i = 0; i < result.Rows; i++) {
+                for (int j = 0; j < result.Cols; j++) {
+                    
+                    double temp = Math.Atan2(-y.Data[i, j], x.Data[i, j]);
+                    result.Data[i, j] = temp;
+                }
+            }
+
+            return result;
+        }
+
+        public static Matrix<double> atan(Matrix<double> y, Matrix<double> x)
+        {
+            Matrix<double> result = y.Clone();
+            for (int i = 0; i < result.Rows; i++) {
+                for (int j = 0; j < result.Cols; j++) {
+                    double temp = Math.Atan2(y.Data[i, j], x.Data[i, j]);
+                    result.Data[i, j] = temp;
+                }
+            }
 
             return result;
         }
@@ -66,7 +194,8 @@ namespace TugasAkhir
         public static Matrix<double> ifftshift(Matrix<double> x) {
             int numDims = 2;
             int[][] idx = new int[numDims][];
-            Matrix<double> y = x;
+            Matrix<double> y = x.Clone();
+
             for (int k = 0; k < numDims; k++) {
                 int m;
                 if (k == 0) {
@@ -86,39 +215,42 @@ namespace TugasAkhir
                 }
                 idx[k] = temp;
             }
-            
+
             for (int i = 0; i < idx[0].Length; i++) {
                 for (int j = 0; j < idx[1].Length; j++) {
-                    y.Data[i, j] = x.Data[idx[0][i], idx[1][j]];
-                    //Console.WriteLine("Y[" + i + "," + j + "] : " + y.Data[i,j] + " -> X[" + idx[0][i] + "," + idx[1][j] + "] : " + x.Data[idx[0][i], idx[1][j]]);
+                    double temp = x.Data[idx[0][i], idx[1][j]];
+                    y.Data[i,j] = temp;
                 }
             }
+
             return y;
         }
 
         public static Matrix<double> sin(Matrix<double> input) {
-            Matrix<double> result = input;
+            Matrix<double> result = input.Clone();
             for (int i = 0; i < input.Rows; i++) {
                 for (int j = 0; j < input.Cols; j++) {
-                    result.Data[i, j] = Math.Sin(input.Data[i, j]);
+                    double temp = Math.Sin(input.Data[i, j]);
+                    result.Data[i, j] = temp;
                 }
             }
             return result;
         }
 
         public static Matrix<double> cos(Matrix<double> input) {
-            Matrix<double> result = input;
+            Matrix<double> result = input.Clone();
             for (int i = 0; i < input.Rows; i++)
             {
                 for (int j = 0; j < input.Cols; j++)
                 {
-                    result.Data[i, j] = Math.Cos(input.Data[i, j]);
+                    double temp = Math.Cos(input.Data[i, j]);
+                    result.Data[i, j] = temp;
                 }
             }
             return result;
         }
 
-        public static Matrix<double> lowpassfilter(int rows, int cols, float cutoff, int n) {
+        public static Matrix<double> lowpassfilter(int rows, int cols, double cutoff, int n) {
             if (cutoff < 0 && cutoff > 0.5) {
                 Console.WriteLine("cutoff frequency must be between 0 and 0.5");
                 return null;
@@ -148,15 +280,17 @@ namespace TugasAkhir
             Matrix<double> multX = Utillity.power(x, 2);
             Matrix<double> multY = Utillity.power(y, 2);
             Matrix<double> radius = Utillity.square(multX.Add(multY));  // A matrix with every pixel = radius relative to centre.
-            Matrix<double> param = radius;
+            Matrix<double> param = radius.Clone();
 
             for (int i = 0; i < radius.Rows; i++) {
                 for (int j = 0; j < radius.Cols; j++) {
-                    param.Data[i, j] = 1 / (Math.Pow(1 + (radius.Data[i, j] / cutoff), (2 * n)));
+                    param.Data[i, j] = 1 / (1.0d + Math.Pow( radius.Data[i, j] / cutoff, (2 * n) ));
+                    //param.Data[i, j] = 1.0f + Math.Pow(radius.Data[i, j] / cutoff, (2 * n));
                 }
             }
+
             Matrix<double> f = Utillity.ifftshift(param);
-            return param;
+            return f;
         }
     }
 }
