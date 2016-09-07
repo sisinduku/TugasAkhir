@@ -1,4 +1,6 @@
 ﻿using Emgu.CV;
+using Emgu.CV.Structure;
+using Emgu.CV.Util;
 using System;
 using System.Collections.Generic;
 using System.Drawing.Drawing2D;
@@ -46,7 +48,7 @@ namespace TugasAkhir
         }
 
         public static Matrix<double> power(Matrix<double> array, int pow) {
-            Matrix<double> result = array;
+            Matrix<double> result = array.Clone();
             for (int i = 0; i < array.Rows; i++)
                 for (int j = 0; j < array.Cols; j++)
                     result.Data[i, j] = Math.Pow(array.Data[i, j], pow);
@@ -144,22 +146,63 @@ namespace TugasAkhir
             return result;
         }
 
+        public static void HeapSort(ref Matrix<double> input)
+        {
+            //Build-Max-Heap
+            int heapSize = input.Cols-1;
+            for (int p = heapSize / 2; p >= 0; p--)
+                MaxHeapify(ref input, heapSize, p);
+
+            for (int i = input.Cols - 1; i > 0; i--)
+            {
+                //Swap
+                double temp = input.Data[0, i];
+                input.Data[0, i] = input.Data[0, 0];
+                input.Data[0, 0] = temp;
+
+                heapSize--;
+                MaxHeapify(ref input, heapSize, 0);
+            }
+        }
+
+        private static void MaxHeapify(ref Matrix<double> input, int heapSize, int index)
+        {
+            int left = 2 * index + 1;
+            int right = 2 * index + 2;
+            int largest = index;
+
+            if (left <= heapSize && input.Data[0, left] > input.Data[0, index])
+                largest = left;            
+
+            if (right <= heapSize && input.Data[0, right] > input.Data[0, largest])
+                largest = right;
+
+            if (largest != index)
+            {
+                double temp = input.Data[0, index];
+                input.Data[0, index] = input.Data[0, largest];
+                input.Data[0, largest] = temp;
+
+                MaxHeapify(ref input, heapSize, largest);
+            }
+        }
+
+        // Masih salah akses data
         public static double median(Matrix<double> array) {
             double med = -1.0;
-            double m = (array.Rows * array.Cols) / 2;
-            int bin = 0;
+            Matrix<double> test = array.Clone();
+            
+            Matrix<double> reshaped = test.Reshape(1, 1).Clone();
+            
+            HeapSort(ref reshaped);            
 
-            int histSize = 256;
-            int[] histSizeArr = new int[] { histSize };
-            float[] range = new float[]{ 0, 256 };
-            bool uniform = true;
-            bool accumulate = false;
-            Matrix<double> hist = new Matrix<double>(0, 255);
-            CvInvoke.CalcHist(array, new int[] { 0 }, new Mat(), hist, histSizeArr, range, accumulate);
-            for (int i = 0; i < histSize && med < 0.0; ++i) {
-                bin += Convert.ToInt32(Math.Round(hist.Data[0, i]));
-                if (bin > m && med < 0.0)
-                    med = i;
+            if (reshaped.Cols % 2 == 1) {
+                med = reshaped.Data[0, Convert.ToInt32(Math.Floor(Convert.ToDouble(reshaped.Cols / 2)))];
+            }
+            else {
+                double temp1 = reshaped.Data[0, reshaped.Cols / 2];
+                double temp2 = reshaped.Data[0, (reshaped.Cols / 2) - 1];
+                med = (temp1 + temp2) / 2;
             }
 
             return med;
@@ -204,15 +247,32 @@ namespace TugasAkhir
                 else {
                     m = x.Size.Width;
                 }
-                int p = (int)Math.Floor((decimal)m / 2);
+                int p;
                 int[] temp = new int[m];
-                for (int i = 0; i < m; i++) {
-                    if (i < p) {
-                        temp[i + 1 + p] = i;
-                    } else {
-                        temp[i - p] = i;
+                if (m % 2 == 1)
+                {
+                    p = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(m) / 2)) - 1;
+                    for (int i = 0; i < m; i++) {
+                        if (i < p) {
+                            temp[i + 1 + p] = i;
+                        }
+                        else {
+                            temp[i - p] = i;
+                        }
                     }
                 }
+                else {
+                    p = m/2;
+                    for (int i = 0; i < m; i++) {
+                        if (i < p) {
+                            temp[i + p] = i;
+                        }
+                        else {
+                            temp[i - p] = i;
+                        }
+                    }
+                }
+                //Convert.ToInt32(Math.Ceiling(Convert.ToDouble(m) / 2)) - 1;                
                 idx[k] = temp;
             }
 
@@ -291,6 +351,33 @@ namespace TugasAkhir
 
             Matrix<double> f = Utillity.ifftshift(param);
             return f;
+        }
+
+        public static Matrix<double> getLabel(List<Matrix<double>> PC) {
+            double maxVal = new double();
+            Matrix<double> result = new Matrix<double>(PC[0].Rows, PC[0].Cols);
+            for (int i = 0; i < PC[0].Rows; i++) {
+                for (int j = 0; j < PC[0].Cols; j++) {
+                    maxVal = Math.Max(Math.Max(Math.Max(PC[0].Data[i, j], PC[1].Data[i, j]), Math.Max(PC[2].Data[i, j], PC[3].Data[i, j])), Math.Max(Math.Max(PC[4].Data[i, j], PC[5].Data[i, j]), Math.Max(PC[6].Data[i, j], PC[7].Data[i, j])));
+                    if (maxVal == PC[7].Data[i, j])
+                        result.Data[i, j] = 7;
+                    else if(maxVal == PC[6].Data[i, j])
+                        result.Data[i, j] = 6;
+                    else if(maxVal == PC[5].Data[i, j])
+                        result.Data[i, j] = 5;
+                    else if (maxVal == PC[4].Data[i, j])
+                        result.Data[i, j] = 4;
+                    else if (maxVal == PC[3].Data[i, j])
+                        result.Data[i, j] = 3;
+                    else if (maxVal == PC[2].Data[i, j])
+                        result.Data[i, j] = 2;
+                    else if (maxVal == PC[1].Data[i, j])
+                        result.Data[i, j] = 1;
+                    else if (maxVal == PC[0].Data[i, j])
+                        result.Data[i, j] = 0;
+                }
+            }
+            return result;
         }
     }
 }

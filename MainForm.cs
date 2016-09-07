@@ -14,6 +14,7 @@ using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.Util;
 using Emgu.CV.UI;
+using System.Collections;
 
 namespace TugasAkhir
 {
@@ -23,7 +24,45 @@ namespace TugasAkhir
         {
             InitializeComponent();
             PhaseCong2 test = new PhaseCong2();
-            int cols = 275;
+
+            Image<Gray, double> image = new Image<Gray, double>(@"E:\Data\Project\TA\Diagnosa kanker payudara dengan SVM dan ekstraksi fitur LESH\core\all-mias\mdb005.pgm");
+
+            List<Matrix<double>> PC = new List<Matrix<double>>();
+            Matrix<double> or = new Matrix<double>(image.Rows, image.Cols);
+            PhaseCong2 phaseCongruency = new PhaseCong2();
+            phaseCongruency.calcPhaseCong2(image.Copy(new Rectangle(477 - 1, (1024 - 133) - 1, 30, 30)), PC, or);
+            //LESH lesh = new LESH();
+            
+            //lesh.calc_LESH(image.Copy(new Rectangle(477 - 1, (1024 - 133) - 1, 30, 30)));
+
+            Matrix<double> img = new Matrix<double>(image.Rows, image.Cols);
+            image.CopyTo(img);
+            //double testing = Utillity.median(img);
+            //Console.WriteLine(testing);
+            Matrix<double> matBDftBlank = img.CopyBlank();
+            Matrix<double> dftIn = new Matrix<double>(img.Rows, img.Cols, 2);
+            using (VectorOfMat mv = new VectorOfMat(new Mat[] { img.Mat, matBDftBlank.Mat }))
+                CvInvoke.Merge(mv, dftIn);
+
+            Matrix<double> dftOut = new Matrix<double>(img.Rows, img.Cols, 2);
+
+            CvInvoke.Dft(dftIn, dftOut, Emgu.CV.CvEnum.DxtType.Forward, 0);
+
+            //The real part of EO
+            Matrix<double> EORealPart = new Matrix<double>(img.Rows, img.Cols);
+            //The imaginary part of EO
+            Matrix<double> EOImPart = new Matrix<double>(img.Rows, img.Cols);
+
+            using (VectorOfMat vm = new VectorOfMat())
+            {
+                vm.Push(EORealPart.Mat);
+                vm.Push(EOImPart.Mat);
+                CvInvoke.Split(dftOut, vm);
+            }
+
+            
+
+            /*int cols = 275;
             int rows = 275;
             int nScale = 5;
             int nOrient = 8;
@@ -40,7 +79,7 @@ namespace TugasAkhir
                     zeros[i, j] = 0;
                 }
             }
-            List<Matrix<double>> ifftFilterArray = new List<Matrix<double>>();
+            List <Matrix<double>> ifftFilterArray = new List<Matrix<double>>();
 
             double[] coba = Utillity.createArray(rows);
             double[] coba2 = Utillity.createArray(cols);
@@ -150,7 +189,8 @@ namespace TugasAkhir
                     Matrix<double> ifftFilt = outReal * Math.Sqrt(rows * cols); //Note rescaling to match power
                     ifftFilterArray.Add(ifftFilt);
                 }
-            }
+            }*/
+
 
             /*for (int i = 0; i < ifftFilt.Rows; i++)
             {

@@ -73,6 +73,7 @@
   <ItemGroup>
     <Compile Include="BHEA.cs" />
     <Compile Include="DBConnect.cs" />
+    <Compile Include="LESH.cs" />
     <Compile Include="PhaseCong2.cs" />
     <Compile Include="PelatihanForm.cs">
       <SubType>Form</SubType>
