@@ -187,14 +187,13 @@ namespace TugasAkhir
             }
         }
 
-        // Masih salah akses data
         public static double median(Matrix<double> array) {
             double med = -1.0;
             Matrix<double> test = array.Clone();
             
             Matrix<double> reshaped = test.Reshape(1, 1).Clone();
             
-            HeapSort(ref reshaped);            
+            HeapSort(ref reshaped);
 
             if (reshaped.Cols % 2 == 1) {
                 med = reshaped.Data[0, Convert.ToInt32(Math.Floor(Convert.ToDouble(reshaped.Cols / 2)))];
@@ -206,6 +205,23 @@ namespace TugasAkhir
             }
 
             return med;
+        }
+
+        public static double minVal(Matrix<double> array) {
+            Matrix<double> sort = array.Clone();
+
+            HeapSort(ref sort);
+
+            return sort.Data[0, 0];
+        }
+
+        public static double maxVal(Matrix<double> array)
+        {
+            Matrix<double> sort = array.Clone();
+
+            HeapSort(ref sort);
+
+            return sort.Data[0, sort.Cols-1];
         }
 
         public static Matrix<double> atanMinY(Matrix<double> y, Matrix<double> x) {
@@ -310,6 +326,19 @@ namespace TugasAkhir
             return result;
         }
 
+        public static Matrix<double> bitwiseEqual(Matrix<double> input, int number)
+        {
+            Matrix<double> result = input.Clone();
+            for (int i = 0; i < input.Rows; i++)
+            {
+                for (int j = 0; j < input.Cols; j++)
+                {
+                    result.Data[i, j] = Convert.ToInt32(input.Data[i, j] == number);
+                }
+            }
+            return result;
+        }
+
         public static Matrix<double> lowpassfilter(int rows, int cols, double cutoff, int n) {
             if (cutoff < 0 && cutoff > 0.5) {
                 Console.WriteLine("cutoff frequency must be between 0 and 0.5");
@@ -359,22 +388,22 @@ namespace TugasAkhir
             for (int i = 0; i < PC[0].Rows; i++) {
                 for (int j = 0; j < PC[0].Cols; j++) {
                     maxVal = Math.Max(Math.Max(Math.Max(PC[0].Data[i, j], PC[1].Data[i, j]), Math.Max(PC[2].Data[i, j], PC[3].Data[i, j])), Math.Max(Math.Max(PC[4].Data[i, j], PC[5].Data[i, j]), Math.Max(PC[6].Data[i, j], PC[7].Data[i, j])));
-                    if (maxVal == PC[7].Data[i, j])
-                        result.Data[i, j] = 7;
-                    else if(maxVal == PC[6].Data[i, j])
-                        result.Data[i, j] = 6;
-                    else if(maxVal == PC[5].Data[i, j])
-                        result.Data[i, j] = 5;
-                    else if (maxVal == PC[4].Data[i, j])
-                        result.Data[i, j] = 4;
+                    if (maxVal == PC[0].Data[i, j])
+                        result.Data[i, j] = 0;
+                    else if(maxVal == PC[1].Data[i, j])
+                        result.Data[i, j] = 1;
+                    else if(maxVal == PC[2].Data[i, j])
+                        result.Data[i, j] = 2;
                     else if (maxVal == PC[3].Data[i, j])
                         result.Data[i, j] = 3;
-                    else if (maxVal == PC[2].Data[i, j])
-                        result.Data[i, j] = 2;
-                    else if (maxVal == PC[1].Data[i, j])
-                        result.Data[i, j] = 1;
-                    else if (maxVal == PC[0].Data[i, j])
-                        result.Data[i, j] = 0;
+                    else if (maxVal == PC[4].Data[i, j])
+                        result.Data[i, j] = 4;
+                    else if (maxVal == PC[5].Data[i, j])
+                        result.Data[i, j] = 5;
+                    else if (maxVal == PC[6].Data[i, j])
+                        result.Data[i, j] = 6;
+                    else if (maxVal == PC[7].Data[i, j])
+                        result.Data[i, j] = 7;
                 }
             }
             return result;

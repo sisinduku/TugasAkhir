@@ -31,6 +31,7 @@ namespace TugasAkhir
             Application.Exit();
         }
 
+        // Thread Load image
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
             // Load file list here
@@ -55,8 +56,8 @@ namespace TugasAkhir
                     break;
                 }
                 else {
-                    Image<Gray, Byte> My_Image = new Image<Gray, byte>(@paths[i-1]);
-                    Image<Gray, Byte> CLAHEImage = My_Image;
+                    Image<Gray, double> My_Image = new Image<Gray, double>(@paths[i-1]);
+                    Image<Gray, double> CLAHEImage = My_Image;
                     CvInvoke.CLAHE(My_Image, 40, new Size(8, 8), CLAHEImage);
                     String fullFileName = paths[i - 1].Split('\\', '/').Last();
                     String fileName = fullFileName.Split('.').First();                    
@@ -180,6 +181,7 @@ namespace TugasAkhir
             backgroundWorker2.RunWorkerAsync();
         }
 
+        // Thread get ROI from images
         private void backgroundWorker2_DoWork(object sender, DoWorkEventArgs e)
         {
             // Load file here
@@ -212,10 +214,10 @@ namespace TugasAkhir
                 else {
                     elements = line.Split(' ');
                     if (!elements[2].Equals("NORM") && !elements[4].Equals("*NOTE3*")) {
-                        container.Add(elements[0]);
-                        container.Add(Int32.Parse(elements[4]));
-                        container.Add(Int32.Parse(elements[5]));
-                        container.Add(Int32.Parse(elements[6]));
+                        container.Add(elements[0]);                 // File name
+                        container.Add(Int32.Parse(elements[4]));    // X0
+                        container.Add(Int32.Parse(elements[5]));    // Y0    
+                        container.Add(Int32.Parse(elements[6]));    // Radius
                         result.Add(container);
 
                         int percentComplete = (int)((float)i / (float)totalImageCount * 100);
@@ -264,23 +266,25 @@ namespace TugasAkhir
 
                 foreach (ArrayList row in roi) {
                     ArrayList container = new ArrayList();
-                    Image<Gray, Byte> My_Image = (Image<Gray, Byte>)listImage[row[0]];
+                    Image<Gray, double> My_Image = (Image<Gray, double>)listImage[row[0]];
                     int x = (int)row[1];
                     int y = 1024 - (int)row[2];
                     int radius = (int)row[3];
 
-                    Image<Gray, Byte> newImage = My_Image.Copy(new Rectangle(x, y, radius, radius));
-                    
-                    container.Add(row[0]);
-                    container.Add(row[3]);
-                    container.Add(newImage);
+                    Image<Gray, double> newImage = My_Image.Copy(new Rectangle(x, y, radius, radius));
+                    Matrix<double> imageMatrix = new Matrix<double>(radius, radius);
+                    newImage.CopyTo(imageMatrix);
+
+                    container.Add(row[0]);          // File name
+                    container.Add(row[3]);          // Radius
+                    container.Add(imageMatrix);     // ROI Image
                     roiImage.Add(container);
                 }
                 Console.WriteLine(roiImage.Count);
-                ArrayList test = (ArrayList)roiImage[10];
-                imageBox1.SizeMode = PictureBoxSizeMode.Zoom;
-                imageBox1.Image = (Image<Gray, Byte>)test[2];
-                Console.WriteLine(test[0]);
+                //ArrayList test = (ArrayList)roiImage[10];
+                //imageBox1.SizeMode = PictureBoxSizeMode.Zoom;
+                //imageBox1.Image = (Image<Gray, Byte>)test[2];
+                //Console.WriteLine(test[0]);
             }
         }
     }

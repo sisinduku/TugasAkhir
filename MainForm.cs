@@ -29,11 +29,11 @@ namespace TugasAkhir
 
             List<Matrix<double>> PC = new List<Matrix<double>>();
             Matrix<double> or = new Matrix<double>(image.Rows, image.Cols);
-            PhaseCong2 phaseCongruency = new PhaseCong2();
-            phaseCongruency.calcPhaseCong2(image.Copy(new Rectangle(477 - 1, (1024 - 133) - 1, 30, 30)), PC, or);
-            //LESH lesh = new LESH();
+            //PhaseCong2 phaseCongruency = new PhaseCong2();
+            //phaseCongruency.calcPhaseCong2(image.Copy(new Rectangle(477 - 1, (1024 - 133) - 1, 30, 30)), PC, or);
+            LESH lesh = new LESH();
             
-            //lesh.calc_LESH(image.Copy(new Rectangle(477 - 1, (1024 - 133) - 1, 30, 30)));
+            lesh.calc_LESH(image.Copy(new Rectangle(477 - 1, (1024 - 133) - 1, 30, 30)));
 
             Matrix<double> img = new Matrix<double>(image.Rows, image.Cols);
             image.CopyTo(img);
