@@ -25,3 +25,6 @@ E:\Data\Project\TA\App\TugasAkhir\TugasAkhir\bin\Debug\MetroFramework.dll
 E:\Data\Project\TA\App\TugasAkhir\TugasAkhir\bin\Debug\MetroFramework.Fonts.dll
 E:\Data\Project\TA\App\TugasAkhir\TugasAkhir\obj\Debug\TugasAkhir.PelatihanForm.resources
 E:\Data\Project\TA\App\TugasAkhir\TugasAkhir\bin\Debug\MySql.Data.dll
+E:\Data\Project\TA\App\TugasAkhir\TugasAkhir\bin\Debug\Emgu.CV.ML.dll
+E:\Data\Project\TA\App\TugasAkhir\TugasAkhir\bin\Debug\Emgu.CV.ML.xml
+E:\Data\Project\TA\App\TugasAkhir\TugasAkhir\obj\Debug\TugasAkhir.PengujianForm.resources

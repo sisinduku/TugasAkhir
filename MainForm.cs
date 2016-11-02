@@ -25,18 +25,23 @@ namespace TugasAkhir
             InitializeComponent();
             PhaseCong2 test = new PhaseCong2();
 
-            Image<Gray, double> image = new Image<Gray, double>(@"E:\Data\Project\TA\Diagnosa kanker payudara dengan SVM dan ekstraksi fitur LESH\core\all-mias\mdb005.pgm");
+            Image<Gray, byte> image = new Image<Gray, byte>(@"E:\Data\Project\TA\Diagnosa kanker payudara dengan SVM dan ekstraksi fitur LESH\core\all-mias\mdb015.pgm");
+            Image<Gray, byte> CLAHEImage = image.Copy();
+            //Image<Gray, double> newIm = image.Convert<Gray, double>().Copy();
+            //CvInvoke.Normalize(newIm.Copy(), newIm, 1, 0);
+            //newIm.Convert<Gray, byte>().CopyTo(image);
+            CvInvoke.CLAHE(image.Copy(), 10, new Size(8, 8), CLAHEImage);
 
-            List<Matrix<double>> PC = new List<Matrix<double>>();
-            Matrix<double> or = new Matrix<double>(image.Rows, image.Cols);
-            //PhaseCong2 phaseCongruency = new PhaseCong2();
-            //phaseCongruency.calcPhaseCong2(image.Copy(new Rectangle(477 - 1, (1024 - 133) - 1, 30, 30)), PC, or);
+            Matrix<double> im = new Matrix<double>(49, 49);
+            //image.Copy(new Rectangle((669) - Convert.ToInt32(63 / 2) , (1024 - 543) - Convert.ToInt32(63 / 2), 63, 63)).Convert<Gray, double>().CopyTo(im);
+            Console.WriteLine(Convert.ToInt32(49 / 2));
             LESH lesh = new LESH();
             
-            lesh.calc_LESH(image.Copy(new Rectangle(477 - 1, (1024 - 133) - 1, 30, 30)));
+            imageBox1.Image = CLAHEImage.Copy(new Rectangle((595) - Convert.ToInt32(82 / 2) , (1024 - 864) - Convert.ToInt32(72 / 2), 72, 72));
+            //Matrix<double> feature = lesh.calc_LESH(CLAHEImage.Copy(new Rectangle(388 - 1, (1024 - 742) - 1, 66, 66)).Convert<Gray, double>());
 
-            Matrix<double> img = new Matrix<double>(image.Rows, image.Cols);
-            image.CopyTo(img);
+            /*Matrix <double> img = new Matrix<double>(image.Rows, image.Cols);
+            //image.CopyTo(img);
             //double testing = Utillity.median(img);
             //Console.WriteLine(testing);
             Matrix<double> matBDftBlank = img.CopyBlank();
@@ -62,7 +67,7 @@ namespace TugasAkhir
 
             
 
-            /*int cols = 275;
+            int cols = 275;
             int rows = 275;
             int nScale = 5;
             int nOrient = 8;
@@ -211,6 +216,15 @@ namespace TugasAkhir
             PelatihanForm pelatihan = new PelatihanForm();
             pelatihan.Tag = this;
             pelatihan.Show(this);
+            //HiddenForms.Add(this);
+            Hide();
+        }
+
+        private void metroButton2_Click(object sender, EventArgs e)
+        {
+            PengujianForm pengujian = new PengujianForm();
+            pengujian.Tag = this;
+            pengujian.Show(this);
             //HiddenForms.Add(this);
             Hide();
         }
