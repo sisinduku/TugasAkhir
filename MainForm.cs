@@ -24,22 +24,33 @@ namespace TugasAkhir
         {
             InitializeComponent();
             PhaseCong2 test = new PhaseCong2();
-
+            LESH lesh = new LESH();
             Image<Gray, byte> image = new Image<Gray, byte>(@"E:\Data\Project\TA\Diagnosa kanker payudara dengan SVM dan ekstraksi fitur LESH\core\all-mias\mdb015.pgm");
             Image<Gray, byte> CLAHEImage = image.Copy();
             //Image<Gray, double> newIm = image.Convert<Gray, double>().Copy();
             //CvInvoke.Normalize(newIm.Copy(), newIm, 1, 0);
             //newIm.Convert<Gray, byte>().CopyTo(image);
-            CvInvoke.CLAHE(image.Copy(), 10, new Size(8, 8), CLAHEImage);
-
-            Matrix<double> im = new Matrix<double>(49, 49);
-            //image.Copy(new Rectangle((669) - Convert.ToInt32(63 / 2) , (1024 - 543) - Convert.ToInt32(63 / 2), 63, 63)).Convert<Gray, double>().CopyTo(im);
-            Console.WriteLine(Convert.ToInt32(49 / 2));
-            LESH lesh = new LESH();
-            
-            imageBox1.Image = CLAHEImage.Copy(new Rectangle((595) - Convert.ToInt32(82 / 2) , (1024 - 864) - Convert.ToInt32(72 / 2), 72, 72));
-            //Matrix<double> feature = lesh.calc_LESH(CLAHEImage.Copy(new Rectangle(388 - 1, (1024 - 742) - 1, 66, 66)).Convert<Gray, double>());
-
+            CLAHEImage = Preprocessing.enhanceImage(image);
+            //CvInvoke.CLAHE(image, 3.56, new Size(8, 8), CLAHEImage);
+            int radius = 68 * 2;
+            float jejari = radius / 2;
+            int x = Convert.ToInt32(595 - jejari);
+            int y = Convert.ToInt32(1024 - 864 - jejari);
+            //imageBox1.Image = CLAHEImage;
+            imageBox1.Image = CLAHEImage.Copy(new Rectangle(x, y, radius, radius));
+            Matrix<double> img = new Matrix<double>(radius, radius);
+            image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>().CopyTo(img);
+            /*for (int i = 0; i < img.Rows; i++)
+            {
+                for (int j = 0; j < img.Cols; j++)
+                {
+                    Console.WriteLine("[" + (i + 1) + ", " + (j + 1) + "] = " + img.Data[i, j]);
+                }
+            }*/
+            //Matrix<double> feature = lesh.calc_LESH(image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>());
+            /*for (int i = 0; i < feature.Cols; i++) {
+                Console.WriteLine(feature.Data[0, i]);
+            }*/
             /*Matrix <double> img = new Matrix<double>(image.Rows, image.Cols);
             //image.CopyTo(img);
             //double testing = Utillity.median(img);
@@ -227,6 +238,19 @@ namespace TugasAkhir
             pengujian.Show(this);
             //HiddenForms.Add(this);
             Hide();
+        }
+
+        private void metroButton3_Click(object sender, EventArgs e)
+        {
+            Debug debug = new Debug();
+            debug.Tag = this;
+            debug.Show(this);
+            Hide();
+        }
+
+        private void imageBox1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

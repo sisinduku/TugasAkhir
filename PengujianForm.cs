@@ -39,6 +39,7 @@ namespace TugasAkhir
             Hide();
         }
 
+        // Memilih direktori citra
         private void metroButton1_Click(object sender, EventArgs e)
         {
             DialogResult result = folderBrowserDialog1.ShowDialog();
@@ -50,6 +51,7 @@ namespace TugasAkhir
             }
         }
 
+        // Load citra
         private void metroButton3_Click(object sender, EventArgs e)
         {
             // Start loading images
@@ -58,6 +60,7 @@ namespace TugasAkhir
             backgroundWorker1.RunWorkerAsync();
         }
 
+        // Fungsi untuk load citra
         Hashtable loadImage(String[] paths, BackgroundWorker worker, DoWorkEventArgs e) {
             int totalImageCount = paths.Length;
             Hashtable listImage = new Hashtable();
@@ -74,7 +77,7 @@ namespace TugasAkhir
                 {
                     Image<Gray, byte> My_Image = new Image<Gray, byte>(@paths[i - 1]);
                     Image<Gray, byte> CLAHEImage = My_Image;
-                    CvInvoke.CLAHE(My_Image, 10, new Size(8, 8), CLAHEImage);
+                    CLAHEImage = Preprocessing.enhanceImage(My_Image);
                     String fullFileName = paths[i - 1].Split('\\', '/').Last();
                     String fileName = fullFileName.Split('.').First();
                     listImage.Add(fileName, CLAHEImage.Clone());
@@ -91,21 +94,24 @@ namespace TugasAkhir
             return listImage;
         }
 
+        // Thread untuk load citra
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
             // Load file here
-            string[] imagePath = Directory.GetFiles(@"E:\Data\Project\TA\Diagnosa kanker payudara dengan SVM dan ekstraksi fitur LESH\core\testing", "*.pgm");
-            //string[] imagePath = Directory.GetFiles(@metroTextBox1.Text, "*.pgm");
+            //string[] imagePath = Directory.GetFiles(@"E:\Data\Project\TA\Diagnosa kanker payudara dengan SVM dan ekstraksi fitur LESH\core\testing", "*.pgm");
+            string[] imagePath = Directory.GetFiles(@metroTextBox1.Text, "*.pgm");
 
             BackgroundWorker worker = sender as BackgroundWorker;
             e.Result = loadImage(imagePath, worker, e);
         }
 
+        // Progress bar load citra
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             this.metroProgressBar1.Value = e.ProgressPercentage;
         }
 
+        // Action setelah load citra selesai
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             // First, handle the case where an exception was thrown.
@@ -132,6 +138,7 @@ namespace TugasAkhir
             }
         }
 
+        // Memilih ROI
         private void metroButton2_Click(object sender, EventArgs e)
         {
             DialogResult result = openFileDialog1.ShowDialog();
@@ -150,6 +157,7 @@ namespace TugasAkhir
             }
         }
 
+        // Memilih lokasi SVM
         private void metroButton4_Click_1(object sender, EventArgs e)
         {
             DialogResult result = openFileDialog1.ShowDialog();
@@ -161,6 +169,7 @@ namespace TugasAkhir
             }
         }
 
+        // Load SVM
         private void metroButton8_Click(object sender, EventArgs e)
         {
             // Start loading images
@@ -169,16 +178,17 @@ namespace TugasAkhir
             backgroundWorker2.RunWorkerAsync();
         }
 
+        // Fungsi untuk load SVM
         SVM loadModel(String paths, BackgroundWorker worker, DoWorkEventArgs e) {
             worker.ReportProgress(0);
             SVM model = new SVM();
             FileStorage fsr = new FileStorage(@paths, FileStorage.Mode.Read);
             model.Read(fsr.GetFirstTopLevelNode());
-
             worker.ReportProgress(100);
             return model;
         }
-
+        
+        // Thread untuk load SVM
         private void backgroundWorker2_DoWork(object sender, DoWorkEventArgs e)
         {
             // Load file here
@@ -188,6 +198,7 @@ namespace TugasAkhir
             e.Result = loadModel(modelPath, worker, e);
         }
 
+        // Progress bar load SVM
         private void backgroundWorker2_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             this.metroProgressBar5.Value = e.ProgressPercentage;
@@ -215,10 +226,12 @@ namespace TugasAkhir
                 // Finally, handle the case where the operation 
                 // succeeded.
                 modelSVM = (SVM)e.Result;
+                
                 metroButton1.Enabled = true;
             }
         }
 
+        // Load ROI
         private void metroButton5_Click(object sender, EventArgs e)
         {
             // Start loading roi
@@ -227,6 +240,8 @@ namespace TugasAkhir
             backgroundWorker3.RunWorkerAsync();
         }
 
+
+        // Fungsi untuk load ROI
         ArrayList loadROI(String paths, BackgroundWorker worker, DoWorkEventArgs e) {
             string line;
             string[] elements;
@@ -252,8 +267,15 @@ namespace TugasAkhir
                     elements = line.Split(' ');
                     if (!elements[2].Equals("NORM") && !elements[4].Equals("*NOTE3*"))
                     {
+                        Console.WriteLine(elements[0]);
                         Image<Gray, byte> My_Image = (Image<Gray, byte>)listImage[elements[0]];
-                        int radius = Int32.Parse(elements[6]) + 14;
+                        int radius = 0;
+                        if ((Int32.Parse(elements[6]) * 2) % 4 == 0) {
+                            radius = Int32.Parse(elements[6]) * 2;
+                        }
+                        else {
+                            radius = (Int32.Parse(elements[6]) * 2) + (4 - ((Int32.Parse(elements[6]) * 2) % 4));
+                        }
                         float jejari = radius / 2;
                         int x = Convert.ToInt32(Int32.Parse(elements[4]) - jejari);
                         int y = Convert.ToInt32(1024 - Int32.Parse(elements[5]) - jejari);
@@ -324,6 +346,7 @@ namespace TugasAkhir
             }
         }
 
+        // Ekstraksi fitur
         private void metroButton6_Click(object sender, EventArgs e)
         {
             // Start extracting feature
@@ -332,6 +355,7 @@ namespace TugasAkhir
             backgroundWorker4.RunWorkerAsync();
         }
 
+        // Fungsi untuk ekstraksi fitur
         List<Matrix<double>> extractFeature(ArrayList roiImage, BackgroundWorker worker, DoWorkEventArgs e)
         {
             int totalImageCount = roiImage.Count;
@@ -342,6 +366,7 @@ namespace TugasAkhir
             LESH leshExtractor = new LESH();
             foreach (ArrayList container in roiImage)
             {
+                Console.WriteLine((string)container[0]);
                 Image<Gray, double> im = (Image<Gray, double>)container[1];
                 Matrix<double> leshFeature = leshExtractor.calc_LESH(im);
                 leshFeatures.Add(leshFeature);
@@ -359,17 +384,20 @@ namespace TugasAkhir
             return leshFeatures;
         }
 
+        // Thread untuk ekstraksi fitur
         private void backgroundWorker4_DoWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
             e.Result = extractFeature(roiImage, worker, e);
         }
 
+        // Progress bar ekstraksi fitur
         private void backgroundWorker4_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             this.metroProgressBar3.Value = e.ProgressPercentage;
         }
 
+        // Action setelah ekstraksi fitur selesai
         private void backgroundWorker4_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             // First, handle the case where an exception was thrown.
@@ -396,6 +424,7 @@ namespace TugasAkhir
             }
         }
 
+        // Klasifikasi citra
         private void metroButton7_Click(object sender, EventArgs e)
         {
             // Start extracting feature
@@ -404,6 +433,7 @@ namespace TugasAkhir
             backgroundWorker5.RunWorkerAsync();
         }
 
+        // Fungsi untuk klasifikasi
         string klasifikasi(List<Matrix<double>> feature, BackgroundWorker worker, DoWorkEventArgs e) {
             worker.ReportProgress(0);
             string result = "";
@@ -416,47 +446,35 @@ namespace TugasAkhir
                 }
                 count++;
             }
-            int acc = 0;
-            for (int i = 0; i < feature.Count; i++) {
-                SVM model = modelSVM;
-                float hasil = model.Predict(fitur.GetRow(i).Clone());
-                string klasifikasi = "";
-                switch (Convert.ToInt32(hasil))
+            Console.WriteLine(modelSVM.C);
+            for (int i = 0; i < fitur.Rows; i++) {
+                float hasil = modelSVM.Predict(fitur.GetRow(i));
+                int target = -1;
+                string kelas = classes[i];
+                switch (kelas)
                 {
-                    case 1:
-                        result += "CALC\n";
-                        klasifikasi = "CALC";
+                    case "CALC":
+                        target = 0;
                         break;
-                    case 2:
-                        result += "CIRC\n";
-                        klasifikasi = "CIRC";
+                    case "CIRC":
+                        target = 1;
                         break;
-                    case 3:
-                        result += "SPIC\n";
-                        klasifikasi = "SPIC";
+                    case "SPIC":
+                        target = 2;
                         break;
-                    case 4:
-                        result += "MISC\n";
-                        klasifikasi = "MISC";
+                    case "MISC":
+                        target = 3;
                         break;
-                    case 5:
-                        result += "ARCH\n";
-                        klasifikasi = "ARCH";
+                    case "ARCH":
+                        target = 4;
                         break;
-                    case 6:
-                        result += "ASYM\n";
-                        klasifikasi = "ASYM";
+                    case "ASYM":
+                        target = 5;
                         break;
                 }
-                if (classes[i].Equals(klasifikasi)) {
-                    acc++;
-                }
+                Console.WriteLine(target + " " + hasil);
+                worker.ReportProgress((int)((float)i / (float)(fitur.Rows - 1) * 100));
             }
-            Console.WriteLine(acc + " " + classes.Count);
-            int jumlah = classes.Count;
-            float akurasi = (acc / jumlah) * 100;
-            Console.WriteLine(akurasi.ToString());
-            worker.ReportProgress(100);
             return result;
         }
 

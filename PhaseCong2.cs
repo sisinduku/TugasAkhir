@@ -205,6 +205,7 @@ namespace TugasAkhir
                 { // For each scale.
                     Matrix<double> filter = Utillity.multArray(logGabor[s - 1], spread[o - 1]); // Multiply radial and angular
                                                                                                 // components to get the filter. 
+                    
                     Matrix<double> matBDftBlank = filter.CopyBlank();
                     Matrix<double> dftIn = new Matrix<double>(filter.Rows, filter.Cols, 2);
                     using (VectorOfMat mv = new VectorOfMat(new Mat[] { filter.Mat, matBDftBlank.Mat }))
@@ -259,6 +260,17 @@ namespace TugasAkhir
                         vm.Push(EOImPart.Mat);
                         CvInvoke.Split(EO[s - 1][o - 1], vm);
                     }
+
+                    /*if (o == 2 && s == 3)
+                    {
+                        for (int i = 0; i < EORealPart.Rows; i++)
+                        {
+                            for (int j = 0; j < EORealPart.Cols; j++)
+                            {
+                                Console.WriteLine("[" + (i + 1) + ", " + (j + 1) + "] = " + EORealPart.Data[i, j] + " + " + EOImPart.Data[i, j]);
+                            }
+                        }
+                    }*/
 
                     // Amplitude of even & odd filter response.
                     Matrix<double> An = new Matrix<double>(rows, cols);
@@ -388,7 +400,7 @@ namespace TugasAkhir
                 double EstNoiseEnergy2 = 2 * noisePower * sumEstSumAn2 + 4 * noisePower * sumEstSumAiAj;
                 double tau = Math.Sqrt(EstNoiseEnergy2 / 2);                              // Rayleigh parameter
                 double EstNoiseEnergy = tau * Math.Sqrt(Math.PI / 2);                     // Expected value of noise energy
-                double EstNoiseEnergySigma = Math.Sqrt((2 - Math.PI / 2) * Math.Pow(tau, 2));
+                double EstNoiseEnergySigma = Math.Sqrt((4 - Math.PI / 2) * Math.Pow(tau, 2));
 
                 double T = EstNoiseEnergy + k * EstNoiseEnergySigma;                    // Noise threshold
                 // The estimated noise effect calculated above is only valid for the PC_1 measure.

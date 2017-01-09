@@ -41,8 +41,8 @@ namespace TugasAkhir
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
             // Load file list here
-            //string[] filePaths = Directory.GetFiles(@metroTextBox1.Text, "*.pgm");
-            string[] filePaths = Directory.GetFiles(@"E:\Data\Project\TA\Diagnosa kanker payudara dengan SVM dan ekstraksi fitur LESH\core\data kanker", "*.pgm");
+            string[] filePaths = Directory.GetFiles(@metroTextBox1.Text, "*.pgm");
+            //string[] filePaths = Directory.GetFiles(@"E:\Data\Project\TA\Diagnosa kanker payudara dengan SVM dan ekstraksi fitur LESH\core\data kanker", "*.pgm");
 
             BackgroundWorker worker = sender as BackgroundWorker;
             e.Result = loadImage(filePaths, worker, e);
@@ -50,6 +50,7 @@ namespace TugasAkhir
             // Cleanup here
         }
 
+        // Fungsi untuk meload citra dan mengenhance citra
         Hashtable loadImage(String[] paths, BackgroundWorker worker, DoWorkEventArgs e) {
             int totalImageCount = paths.Length;
             Hashtable listImage = new Hashtable();
@@ -64,7 +65,7 @@ namespace TugasAkhir
                 else {
                     Image<Gray, byte> My_Image = new Image<Gray, byte>(@paths[i - 1]);
                     Image<Gray, byte> CLAHEImage = My_Image;
-                    CvInvoke.CLAHE(My_Image, 10, new Size(8, 8), CLAHEImage);
+                    CLAHEImage = Preprocessing.enhanceImage(My_Image);
                     String fullFileName = paths[i - 1].Split('\\', '/').Last();
                     String fileName = fullFileName.Split('.').First();
                     listImage.Add(fileName, CLAHEImage.Clone());
@@ -81,14 +82,13 @@ namespace TugasAkhir
             return listImage;
         }
 
-        // This event handler updates the progress bar.
+        // Progress bar load image
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             this.metroProgressBar1.Value = e.ProgressPercentage;
         }
 
-        // This event handler deals with the results of the
-        // background operation.
+        // Action setelah load image sukses
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             // First, handle the case where an exception was thrown.
@@ -122,6 +122,7 @@ namespace TugasAkhir
 
         }
 
+        // Memilih folder citra
         private void metroButton1_Click_1(object sender, EventArgs e)
         {
             DialogResult result = folderBrowserDialog1.ShowDialog();
@@ -133,6 +134,7 @@ namespace TugasAkhir
             }
         }
 
+        // Menjalankan load citra
         private void metroButton3_Click_2(object sender, EventArgs e)
         {
             // Start loading images
@@ -148,12 +150,15 @@ namespace TugasAkhir
             // the asynchronous operation runs.
         }
 
+
+        // Cancel load citra
         private void metroButton4_Click(object sender, EventArgs e)
         {
             // Cancel the asynchronous operation.
             this.backgroundWorker1.CancelAsync();
         }
 
+        // Memilih ROI citra
         private void metroButton2_Click(object sender, EventArgs e)
         {
             DialogResult result = openFileDialog1.ShowDialog();
@@ -172,6 +177,7 @@ namespace TugasAkhir
             }
         }
 
+        // Menjalankan load ROI
         private void metroButton5_Click(object sender, EventArgs e)
         {
             // Start loading images
@@ -190,6 +196,7 @@ namespace TugasAkhir
             e.Result = loadROI(roiPaths, worker, e);
         }
 
+        // Fungsi untuk load ROI
         ArrayList loadROI(String paths, BackgroundWorker worker, DoWorkEventArgs e) {
             string line;
             string[] elements;
@@ -213,8 +220,15 @@ namespace TugasAkhir
                 else {
                     elements = line.Split(' ');
                     if (!elements[2].Equals("NORM") && !elements[4].Equals("*NOTE3*")) {
+                        Console.WriteLine(elements[0]);
                         Image<Gray, byte> My_Image = (Image<Gray, byte>)listImage[elements[0]];
-                        int radius = Int32.Parse(elements[6]) + 14;
+                        int radius = 0;
+                        if ((Int32.Parse(elements[6]) * 2) % 4 == 0) {
+                            radius = Int32.Parse(elements[6]) * 2;
+                        }
+                        else {
+                            radius = (Int32.Parse(elements[6]) * 2) + (4 - ((Int32.Parse(elements[6]) * 2) % 4));
+                        }
                         float jejari = radius / 2;
                         int x = Convert.ToInt32(Int32.Parse(elements[4]) - jejari);
                         int y = Convert.ToInt32(1024 - Int32.Parse(elements[5]) - jejari);
@@ -241,12 +255,13 @@ namespace TugasAkhir
             return result;
         }
 
-        // This event handler updates the progress bar.
+        // Progress bar load ROI
         private void backgroundWorker2_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             this.metroProgressBar2.Value = e.ProgressPercentage;
         }
 
+        // Action setelah load ROI berhasil
         private void backgroundWorker2_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             // First, handle the case where an exception was thrown.
@@ -276,13 +291,10 @@ namespace TugasAkhir
 
                 Console.WriteLine(roiImage.Count);
                 metroButton6.Enabled = true;
-                //ArrayList test = (ArrayList)roiImage[10];
-                //imageBox1.SizeMode = PictureBoxSizeMode.Zoom;
-                //imageBox1.Image = (Image<Gray, Byte>)test[2];
-                //Console.WriteLine(test[0]);
             }
         }
 
+        // Menjalankan ekstraksi fitur
         private void metroButton6_Click(object sender, EventArgs e)
         {
             // Extracting Features
@@ -291,6 +303,7 @@ namespace TugasAkhir
             backgroundWorker3.RunWorkerAsync();
         }
 
+        // Fungsi ekstraksi fitur
         List<Matrix<double>> extractFeature(ArrayList roiImage, BackgroundWorker worker, DoWorkEventArgs e) {
             int totalImageCount = roiImage.Count;
             int i = 1;
@@ -316,12 +329,14 @@ namespace TugasAkhir
             return leshFeatures;
         }
 
+        // Thread ekstraksi fitur
         private void backgroundWorker3_DoWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
             e.Result = extractFeature(roiImage, worker, e);
         }
 
+        // Action setelah ekstraksi fitur selesai
         private void backgroundWorker3_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             // First, handle the case where an exception was thrown.
@@ -350,11 +365,13 @@ namespace TugasAkhir
             }
         }
 
+        // Progress bar ekstraksi fitur
         private void backgroundWorker3_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             this.metroProgressBar3.Value = e.ProgressPercentage;
         }
 
+        // Melatih SVM
         private void metroButton7_Click(object sender, EventArgs e)
         {
             // Train SVM
@@ -363,6 +380,7 @@ namespace TugasAkhir
             backgroundWorker4.RunWorkerAsync();
         }
 
+        // Fungsi untuk melatih SVM
         SVM trainSVM(List<Matrix<double>> samples, List<string> classes, BackgroundWorker worker, DoWorkEventArgs e) {
             int count = 0;
 
@@ -377,109 +395,55 @@ namespace TugasAkhir
 
             // Initialize response
             Matrix<int> response = new Matrix<int>(classes.Count, 1);
-            /*List<Matrix<int>> responses = new List<Matrix<int>>();
-            Matrix<int> responseCALC = new Matrix<int>(classes.Count, 1);
-            Matrix<int> responseCIRC = new Matrix<int>(classes.Count, 1);
-            Matrix<int> responseSPIC = new Matrix<int>(classes.Count, 1);
-            Matrix<int> responseMISC = new Matrix<int>(classes.Count, 1);
-            Matrix<int> responseARCH = new Matrix<int>(classes.Count, 1);
-            Matrix<int> responseASYM = new Matrix<int>(classes.Count, 1);*/
             
             count = 0;
             foreach (string kelas in classes) {
-                Console.WriteLine(kelas);
+                //Console.WriteLine(kelas);
                 switch (kelas) {
                     case "CALC":
-                        response.Data[count, 0] = 1;
+                        response.Data[count, 0] = 0;
                         break;
                     case "CIRC":
-                        response.Data[count, 0] = 2;
+                        response.Data[count, 0] = 1;
                         break;
                     case "SPIC":
-                        response.Data[count, 0] = 3;
+                        response.Data[count, 0] = 2;
                         break;
                     case "MISC":
-                        response.Data[count, 0] = 4;
+                        response.Data[count, 0] = 3;
                         break;
                     case "ARCH":
-                        response.Data[count, 0] = 5;
+                        response.Data[count, 0] = 4;
                         break;
                     case "ASYM":
-                        response.Data[count, 0] = 6;
+                        response.Data[count, 0] = 5;
                         break;
                 }
-                /*if (kelas == "CALC") {
-                    responseCALC.Data[count, 0] = 1;
-                    responseCIRC.Data[count, 0] = -1;
-                    responseSPIC.Data[count, 0] = -1;
-                    responseMISC.Data[count, 0] = -1;
-                    responseARCH.Data[count, 0] = -1;
-                    responseASYM.Data[count, 0] = -1;
-                }
-                else if (kelas == "CIRC") {
-                    responseCALC.Data[count, 0] = -1;
-                    responseCIRC.Data[count, 0] = 1;
-                    responseSPIC.Data[count, 0] = -1;
-                    responseMISC.Data[count, 0] = -1;
-                    responseARCH.Data[count, 0] = -1;
-                    responseASYM.Data[count, 0] = -1;
-                }
-                else if (kelas == "SPIC") {
-                    responseCALC.Data[count, 0] = -1;
-                    responseCIRC.Data[count, 0] = -1;
-                    responseSPIC.Data[count, 0] = 1;
-                    responseMISC.Data[count, 0] = -1;
-                    responseARCH.Data[count, 0] = -1;
-                    responseASYM.Data[count, 0] = -1;
-                }
-                else if (kelas == "MISC") {
-                    responseCALC.Data[count, 0] = -1;
-                    responseCIRC.Data[count, 0] = -1;
-                    responseSPIC.Data[count, 0] = -1;
-                    responseMISC.Data[count, 0] = 1;
-                    responseARCH.Data[count, 0] = -1;
-                    responseASYM.Data[count, 0] = -1;
-                }
-                else if (kelas == "ARCH") {
-                    responseCALC.Data[count, 0] = -1;
-                    responseCIRC.Data[count, 0] = -1;
-                    responseSPIC.Data[count, 0] = -1;
-                    responseMISC.Data[count, 0] = -1;
-                    responseARCH.Data[count, 0] = 1;
-                    responseASYM.Data[count, 0] = -1;
-                }
-                else if (kelas == "ASYM") {
-                    responseCALC.Data[count, 0] = -1;
-                    responseCIRC.Data[count, 0] = -1;
-                    responseSPIC.Data[count, 0] = -1;
-                    responseMISC.Data[count, 0] = -1;
-                    responseARCH.Data[count, 0] = -1;
-                    responseASYM.Data[count, 0] = 1;
-                }*/
                 count++;
             }
-            //Console.WriteLine(responseCALC.Rows + " " + responseCIRC.Rows + " " + responseSPIC.Rows + " " + responseMISC.Rows + " " + responseARCH.Rows + " " + responseASYM.Rows);
-            /*responses.Add(responseCALC);
-            responses.Add(responseCIRC);
-            responses.Add(responseSPIC);
-            responses.Add(responseMISC);
-            responses.Add(responseARCH);
-            responses.Add(responseASYM);*/
+            /*for (int i = 0; i < response.Rows; i++)
+            {
+                Console.WriteLine("[" + (i + 1) + "] = " + response.Data[i, 0]);
+            }*/
 
             // Initialize SVM
             SVM model = new SVM();
-            model.SetKernel(SVM.SvmKernelType.Linear);
             model.Type = SVM.SvmType.CSvc;
-            model.C = 5;
-            model.TermCriteria = new MCvTermCriteria(10000, 0.00001);
-            model.Gamma = 0.10000000000000001;
+            model.SetKernel(SVM.SvmKernelType.Poly);
+            model.TermCriteria = new MCvTermCriteria(100, 0.00001);
+            model.Degree = 1;
+            model.C = 1;
+            model.Coef0 = 1;
+            model.Gamma = 1;
 
             // Initialize TrainData
             //Matrix<int> respon = responses[j];
             TrainData trainData = new TrainData(data, Emgu.CV.ML.MlEnum.DataLayoutType.RowSample, response);
 
-            model.Train(trainData);
-
+            bool training = model.TrainAuto(trainData, 4);
+            Console.WriteLine(training);
+            float hasil = model.Predict(data.GetRow(35));
+            Console.WriteLine(response.Data[35,0] + " " + hasil);
             worker.ReportProgress(100);
 
             return model;
@@ -492,11 +456,13 @@ namespace TugasAkhir
             e.Result = trainSVM(featureList, classes, worker, e);
         }
 
+        // Progress bar pelatihan SVM
         private void backgroundWorker4_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             this.metroProgressBar4.Value = e.ProgressPercentage;
         }
 
+        // Action setelah pelatihan selesai
         private void backgroundWorker4_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             // First, handle the case where an exception was thrown.
@@ -523,6 +489,7 @@ namespace TugasAkhir
             }
         }
 
+        // Menyimpan SVM ke dalam file
         private void metroButton8_Click(object sender, EventArgs e)
         {
             // Save SVM
@@ -531,11 +498,13 @@ namespace TugasAkhir
             backgroundWorker5.RunWorkerAsync();
         }
 
+        // Fungsi untuk menyimpan SVM
         void saveSVM(SVM modelSVM, string path, BackgroundWorker worker, DoWorkEventArgs e) {
             modelSVM.Save(path + "model.xml");
             worker.ReportProgress(100);
         }
 
+        // Memilih lokasi penyimpanan SVM
         private void metroButton9_Click(object sender, EventArgs e)
         {
             DialogResult result = folderBrowserDialog1.ShowDialog();
@@ -547,6 +516,7 @@ namespace TugasAkhir
             }
         }
 
+        // Thread untuk menyimpan SVM
         private void backgroundWorker5_DoWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
@@ -554,6 +524,7 @@ namespace TugasAkhir
             saveSVM(modelSVM, path, worker, e);
         }
 
+        // Action ketika SVM berhasil disimpan
         private void backgroundWorker5_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             this.metroProgressBar5.Value = e.ProgressPercentage;

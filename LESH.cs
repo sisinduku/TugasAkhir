@@ -87,9 +87,9 @@ namespace TugasAkhir
                     Shape_vect.Data[0, i] = 0;
             }
 
-            //HaarWavelet haar = new HaarWavelet();
-            //haar.FWT(ref Shape_vect);
-            //Matrix<double> selectedLESH = Shape_vect.GetCols(0, Shape_vect.Cols/2);
+            /*DBWavelet db = new DBWavelet();
+            db.FWT(ref Shape_vect);
+            Matrix<double> selectedLESH = Shape_vect.GetCols(0, Shape_vect.Cols/2);*/
 
             return Shape_vect;
         }
