@@ -76,6 +76,7 @@
       <DependentUpon>Debug.cs</DependentUpon>
     </Compile>
     <Compile Include="DBWavelet.cs" />
+    <Compile Include="GLCM.cs" />
     <Compile Include="LESH.cs" />
     <Compile Include="PengujianForm.cs">
       <SubType>Form</SubType>

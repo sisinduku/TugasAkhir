@@ -25,28 +25,48 @@ namespace TugasAkhir
             InitializeComponent();
             PhaseCong2 test = new PhaseCong2();
             LESH lesh = new LESH();
-            Image<Gray, byte> image = new Image<Gray, byte>(@"E:\Data\Project\TA\Diagnosa kanker payudara dengan SVM dan ekstraksi fitur LESH\core\all-mias\mdb015.pgm");
+            GLCM glcm = new GLCM();
+            Image<Gray, byte> image = new Image<Gray, byte>(@"E:\Data\Project\TA\Diagnosa kanker payudara dengan SVM dan ekstraksi fitur LESH\core\all-mias\mdb132.pgm");
             Image<Gray, byte> CLAHEImage = image.Copy();
             //Image<Gray, double> newIm = image.Convert<Gray, double>().Copy();
             //CvInvoke.Normalize(newIm.Copy(), newIm, 1, 0);
             //newIm.Convert<Gray, byte>().CopyTo(image);
-            CLAHEImage = Preprocessing.enhanceImage(image);
+            //CLAHEImage = Preprocessing.enhanceImage(image);
             //CvInvoke.CLAHE(image, 3.56, new Size(8, 8), CLAHEImage);
-            int radius = 68 * 2;
+            int radius = 18 * 2;
             float jejari = radius / 2;
-            int x = Convert.ToInt32(595 - jejari);
-            int y = Convert.ToInt32(1024 - 864 - jejari);
+            int x = Convert.ToInt32(335 - jejari);
+            int y = Convert.ToInt32(1024 - 766 - jejari);
             //imageBox1.Image = CLAHEImage;
             imageBox1.Image = CLAHEImage.Copy(new Rectangle(x, y, radius, radius));
-            Matrix<double> img = new Matrix<double>(radius, radius);
-            image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>().CopyTo(img);
-            /*for (int i = 0; i < img.Rows; i++)
+            //Matrix<double> img = new Matrix<double>(radius, radius);
+            //image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>().CopyTo(img);
+            List<Matrix<double>> PC = new List<Matrix<double>>();
+            PhaseCong2 phaseCongruency = new PhaseCong2();
+            phaseCongruency.calcPhaseCong2(image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>(), PC, new Matrix<double>(radius / 2, radius / 2));
+            Matrix<double> localEnergy = new Matrix<double>(PC[0].Rows, PC[0].Cols);
+            //Matrix<float> feature = glcm.calc_GLCM(image.Copy(new Rectangle(x, y, radius/2, radius/2)).Convert<Gray, double>(), 0);
+            for (int i = 0; i < PC.Count; i++)
             {
-                for (int j = 0; j < img.Cols; j++)
+                localEnergy += PC[i];
+            }
+            using (Matrix<double> tempShapeVect = localEnergy.Clone()) {
+                double max = 0, min = 0;
+                Point x0 = new Point();
+                Point y0 = new Point();
+                CvInvoke.MinMaxLoc(tempShapeVect, ref min, ref max, ref x0, ref y0);
+                Console.WriteLine(min);
+                Console.WriteLine(max);
+                localEnergy = (tempShapeVect - min) * 255 / (max - min);
+            }
+
+            for (int i = 0; i < localEnergy.Rows; i++)
+            {
+                for (int j = 0; j < localEnergy.Cols; j++)
                 {
-                    Console.WriteLine("[" + (i + 1) + ", " + (j + 1) + "] = " + img.Data[i, j]);
+                    Console.WriteLine("[" + (i + 1) + ", " + (j + 1) + "] = " + localEnergy.Convert<int>().Data[i, j]);
                 }
-            }*/
+            }
             //Matrix<double> feature = lesh.calc_LESH(image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>());
             /*for (int i = 0; i < feature.Cols; i++) {
                 Console.WriteLine(feature.Data[0, i]);

@@ -117,6 +117,7 @@ namespace TugasAkhir
                 {
                     Image<Gray, byte> My_Image = new Image<Gray, byte>(@paths[i - 1]);
                     Image<Gray, byte> CLAHEImage = My_Image;
+                    
                     CLAHEImage = Preprocessing.enhanceImage(My_Image);
                     String fullFileName = paths[i - 1].Split('\\', '/').Last();
                     String fileName = fullFileName.Split('.').First();
@@ -178,6 +179,7 @@ namespace TugasAkhir
                     Console.WriteLine(elemen.Key);
                 }
                 Console.WriteLine(listImage.Count);
+                metroButton2.Enabled = true;
             }
 
             // Enable the Start button.
@@ -472,37 +474,56 @@ namespace TugasAkhir
 
             for (int fold = 0; fold < 5; fold++) {
                 // Data latih dan testing
-                Matrix<float> dataFold = new Matrix<float>(72, 128);
-                Matrix<float> testingFold = new Matrix<float>(18, 128);
+                Matrix<float> dataFold = new Matrix<float>(1, 64);
+                Matrix<float> testingFold = new Matrix<float>(1, 64);
 
                 // response latih dan testing
-                Matrix<int> targetFold = new Matrix<int>(72, 1);
-                Matrix<int> responseFold = new Matrix<int>(18, 1);
+                Matrix<int> targetFold = new Matrix<int>(1, 1);
+                Matrix<int> responseFold = new Matrix<int>(1, 1);
                 for (int kelas = 0; kelas < 6; kelas++) {
                     if (fold != 0) {
-                        Matrix<float> dataKelas = data.GetRows((kelas * 15), (kelas * 15) + (fold * 3), 1);
-                        dataFold = dataFold.ConcateVertical(dataKelas);
-                        Matrix<int> targetKelas = response.GetRows((kelas * 15), (kelas * 15) + (fold * 3), 1);
-                        targetFold = targetFold.ConcateVertical(targetKelas);
+                        Matrix<float> dataKelas = data.GetRows((kelas * 15), (kelas * 15) + (fold * 3), 1).Clone();
+                        dataFold = dataFold.ConcateVertical(dataKelas).Clone();
+                        Matrix<int> targetKelas = response.GetRows((kelas * 15), (kelas * 15) + (fold * 3), 1).Clone();
+                        targetFold = targetFold.ConcateVertical(targetKelas).Clone();
                     }
-                    Matrix<float> testingKelas = data.GetRows((kelas * 15) + (fold * 3), 3 + (kelas * 15) + (fold * 3), 1);
-                    testingFold = testingFold.ConcateVertical(testingKelas);
-                    Matrix<int> responseKelas = response.GetRows((kelas * 15) + (fold * 3), 3 + (kelas * 15) + (fold * 3), 1);
-                    responseFold = responseFold.ConcateVertical(responseKelas);
+                    Matrix<float> testingKelas = data.GetRows((kelas * 15) + (fold * 3), 3 + (kelas * 15) + (fold * 3), 1).Clone();
+                    testingFold = testingFold.ConcateVertical(testingKelas).Clone();
+                    Matrix<int> responseKelas = response.GetRows((kelas * 15) + (fold * 3), 3 + (kelas * 15) + (fold * 3), 1).Clone();
+                    responseFold = responseFold.ConcateVertical(responseKelas).Clone();
                     if (fold != 4)
                     {
-                        Matrix<float> dataKelas = data.GetRows(3 + (kelas * 15) + (fold * 3), ((kelas + 1) * 15), 1);
-                        dataFold = dataFold.ConcateVertical(dataKelas);
-                        Matrix<int> targetKelas = response.GetRows(3 + (kelas * 15) + (fold * 3), ((kelas + 1) * 15), 1);
-                        targetFold = targetFold.ConcateVertical(targetKelas);
+                        Matrix<float> dataKelas = data.GetRows(3 + (kelas * 15) + (fold * 3), ((kelas + 1) * 15), 1).Clone();
+                        dataFold = dataFold.ConcateVertical(dataKelas).Clone();
+                        Matrix<int> targetKelas = response.GetRows(3 + (kelas * 15) + (fold * 3), ((kelas + 1) * 15), 1).Clone();
+                        targetFold = targetFold.ConcateVertical(targetKelas).Clone();
                     }
                 }
 
+                dataFold = dataFold.RemoveRows(0, 1).Clone();
+                testingFold = testingFold.RemoveRows(0, 1).Clone();
+                targetFold = targetFold.RemoveRows(0, 1).Clone();
+                responseFold = responseFold.RemoveRows(0, 1).Clone();
+
+                Console.WriteLine("train " + dataFold.Rows + " " + dataFold.Cols);
+                Console.WriteLine("testing " + testingFold.Rows + " " + testingFold.Cols);
+                Console.WriteLine("target train " + targetFold.Rows + " " + targetFold.Cols);
+                Console.WriteLine("response test " + responseFold.Rows + " " + responseFold.Cols);
+
+                /*if (fold == 1) {
+                    for (int i = 0; i < dataFold.Rows; i++) {
+                        Console.WriteLine(targetFold.Data[i, 0]);
+                        for (int j = 0; j < dataFold.Cols; j++) {
+                            Console.Write(dataFold.Data[i, j] + " ");
+                        }
+                        Console.WriteLine();
+                    }
+                }*/
                 // Initialize SVM
                 SVM model = new SVM();
                 model.Type = SVM.SvmType.CSvc;
                 model.SetKernel(SVM.SvmKernelType.Poly);
-                model.TermCriteria = new MCvTermCriteria(100, 0.00001);
+                model.TermCriteria = new MCvTermCriteria(10000, 0.000001);
                 model.Degree = 1;
                 model.C = 1;
                 model.Coef0 = 1;
@@ -521,6 +542,7 @@ namespace TugasAkhir
                     if (hasil == responseFold.Data[i, 0])
                         acc++;
                 }
+                model.Dispose();
                 Console.WriteLine(((float)acc/(float)testingFold.Rows) * 100);
 
                 int percentComplete = (int)(( (float)(fold + 1) / (float)5 ) * 100);

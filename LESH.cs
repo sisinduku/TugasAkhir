@@ -87,11 +87,19 @@ namespace TugasAkhir
                     Shape_vect.Data[0, i] = 0;
             }
 
-            /*DBWavelet db = new DBWavelet();
+            using (Matrix<double> tempShapeVect = Shape_vect.Clone())
+            {
+                Shape_vect = ((tempShapeVect - Utillity.minVal(tempShapeVect)) * (1 - (-1)) / (Utillity.maxVal(tempShapeVect) - Utillity.minVal(tempShapeVect))) + (-1);
+            }
+            DBWavelet db = new DBWavelet();
             db.FWT(ref Shape_vect);
-            Matrix<double> selectedLESH = Shape_vect.GetCols(0, Shape_vect.Cols/2);*/
+            Matrix<double> selectedLESH = Shape_vect.GetCols(0, Shape_vect.Cols/2);
 
-            return Shape_vect;
+            using (Matrix<double> tempShapeVect = selectedLESH.Clone())
+            {
+                selectedLESH = ((tempShapeVect - Utillity.minVal(tempShapeVect)) / (Utillity.maxVal(tempShapeVect) - Utillity.minVal(tempShapeVect)));
+            }
+            return selectedLESH;
         }
     }
 }
