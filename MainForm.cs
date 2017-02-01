@@ -43,7 +43,7 @@ namespace TugasAkhir
             //image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>().CopyTo(img);
             List<Matrix<double>> PC = new List<Matrix<double>>();
             PhaseCong2 phaseCongruency = new PhaseCong2();
-            phaseCongruency.calcPhaseCong2(image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>(), PC, new Matrix<double>(radius / 2, radius / 2));
+            phaseCongruency.calcPhaseCong2(image.Copy(new Rectangle(x, y, radius / 2, radius / 2)).Convert<Gray, double>(), PC, new Matrix<double>(radius / 2, radius / 2));
             Matrix<double> localEnergy = new Matrix<double>(PC[0].Rows, PC[0].Cols);
             //Matrix<float> feature = glcm.calc_GLCM(image.Copy(new Rectangle(x, y, radius/2, radius/2)).Convert<Gray, double>(), 0);
             for (int i = 0; i < PC.Count; i++)
@@ -59,8 +59,20 @@ namespace TugasAkhir
                 Console.WriteLine(max);
                 localEnergy = (tempShapeVect - min) * 255 / (max - min);
             }
+            Matrix<float> leshFeature = glcm.featureGLCM(localEnergy.Convert<int>());
+            MCvScalar meanVec = new MCvScalar();
+            MCvScalar stdVec = new MCvScalar();
+            for (int i = 0; i < leshFeature.Cols; i++)
+                Console.WriteLine(i + " " + leshFeature.Data[0, i]);
+            Matrix<float> dimention = leshFeature.GetRow(0);
+            CvInvoke.MeanStdDev(leshFeature.Clone().Transpose(), ref meanVec, ref stdVec);
+            Console.WriteLine(meanVec.V0 + " " + stdVec.V0);
+            dimention = (dimention.Clone() - meanVec.V0) / (stdVec.V0 + 0.000000001f);
+            for (int i = 0; i < leshFeature.Cols; i++) {
+                Console.WriteLine(i + " " + dimention.Data[0, i]);
+            }
 
-            for (int i = 0; i < localEnergy.Rows; i++)
+            /*for (int i = 0; i < localEnergy.Rows; i++)
             {
                 for (int j = 0; j < localEnergy.Cols; j++)
                 {

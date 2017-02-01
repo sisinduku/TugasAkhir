@@ -19,20 +19,22 @@ namespace TugasAkhir
             Matrix<float> sudut90 = calc_GLCM(img, 90);
             Matrix<float> sudut135 = calc_GLCM(img, 135);
 
-            for (int i = 0; i < 13; i = i + 2) {
-                result.Data[0, i] = (sudut0.Data[0, i] + sudut45.Data[0, i] + sudut90.Data[0, i] + sudut135.Data[0, i]) / 4;
-                result.Data[0, i + 1] = Math.Max(Math.Max(sudut0.Data[0, i], sudut45.Data[0, i]), Math.Max(sudut90.Data[0, i], sudut135.Data[0, i]));
+            int j = 0;
+            for (int i = 0; i < 13; i++) {
+                result.Data[0, j] = (sudut0.Data[0, i] + sudut45.Data[0, i] + sudut90.Data[0, i] + sudut135.Data[0, i]) / 4;
+                result.Data[0, j + 1] = Math.Max(Math.Max(sudut0.Data[0, i], sudut45.Data[0, i]), Math.Max(sudut90.Data[0, i], sudut135.Data[0, i])) - Math.Min(Math.Min(sudut0.Data[0, i], sudut45.Data[0, i]), Math.Min(sudut90.Data[0, i], sudut135.Data[0, i]));
+                j += 2;
             }
             return result;
         }
 
         public Matrix<float> calc_GLCM(Matrix<int> img, int sudut) {
-            float variance = 0, mean = 0, mean2 = 0, std = 0;
+            float variance = 0, mean = 0;
             float[] pxplusy = new float[512];
             float[] pxminy = new float[512];
             float[] px = new float[256];
             float[] py = new float[256];
-            float asm = 0, contrast = 0, correlation = 0, correlation2 = 0, homogenity = 0, IDM = 0, entropy = 0, varianceDesk = 0, sumAverage = 0, difAverage = 0;
+            float asm = 0, contrast = 0, correlation = 0, homogenity = 0, IDM = 0, entropy = 0, sumAverage = 0, difAverage = 0;
             float sumEntropy = 0, difEntropy = 0, sumVariance = 0, difVariance = 0;
             int row = img.Rows, col = img.Cols;
             Matrix<float> gl = new Matrix<float>(256, 256);
@@ -68,7 +70,6 @@ namespace TugasAkhir
             gl = gl + gl.Transpose();
             gl = gl / CvInvoke.Sum(gl).V0;
 
-            Console.WriteLine(CvInvoke.Sum(gl).V0);
             Matrix<float> result = new Matrix<float>(1, 13);
 
             // mean = calcMean(gl);
@@ -135,7 +136,6 @@ namespace TugasAkhir
                 hy += -(py[i] * (float)Math.Log10(py[i] + epsilon));
                 correlation += rowVal;
             }
-            Console.WriteLine(correlation + " " + correlation2);
             float imc1 = (hxy - hxy1) / (Math.Max(hx, hy));
             float imc2 = (float)Math.Sqrt(1 - (float)Math.Exp(-2 * (hxy2 - hxy)));
 

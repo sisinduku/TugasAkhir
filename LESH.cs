@@ -78,27 +78,27 @@ namespace TugasAkhir
                 }
             }
 
-            using (Matrix<double> tempShapeVect = Shape_vect.Clone()) {
+            /*using (Matrix<double> tempShapeVect = Shape_vect.Clone()) {
                 Shape_vect = (tempShapeVect - Utillity.minVal(tempShapeVect)) / (Utillity.maxVal(tempShapeVect) - Utillity.minVal(tempShapeVect));
-            }
+            }*/
 
             for (int i = 0; i < Shape_vect.Cols; i++) {
                 if (Double.IsNaN(Shape_vect.Data[0, i]))
                     Shape_vect.Data[0, i] = 0;
             }
 
-            using (Matrix<double> tempShapeVect = Shape_vect.Clone())
+            /*using (Matrix<double> tempShapeVect = Shape_vect.Clone())
             {
                 Shape_vect = ((tempShapeVect - Utillity.minVal(tempShapeVect)) * (1 - (-1)) / (Utillity.maxVal(tempShapeVect) - Utillity.minVal(tempShapeVect))) + (-1);
-            }
+            }*/
             DBWavelet db = new DBWavelet();
             db.FWT(ref Shape_vect);
             Matrix<double> selectedLESH = Shape_vect.GetCols(0, Shape_vect.Cols/2);
 
-            using (Matrix<double> tempShapeVect = selectedLESH.Clone())
+            /*using (Matrix<double> tempShapeVect = selectedLESH.Clone())
             {
                 selectedLESH = ((tempShapeVect - Utillity.minVal(tempShapeVect)) / (Utillity.maxVal(tempShapeVect) - Utillity.minVal(tempShapeVect)));
-            }
+            }*/
             return selectedLESH;
         }
     }
