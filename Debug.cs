@@ -468,8 +468,8 @@ namespace TugasAkhir
                 Point x0 = new Point();
                 Point y0 = new Point();
                 CvInvoke.MinMaxLoc(dimention.Clone(), ref min, ref max, ref x0, ref y0);
-                CvInvoke.MeanStdDev(dimention.Clone(), ref meanVec, ref stdVec);
                 dimention = (dimention.Clone() - min) / (max - min);*/
+                CvInvoke.MeanStdDev(dimention.Clone(), ref meanVec, ref stdVec);
                 dimention = (dimention.Clone() - meanVec.V0) / (stdVec.V0 + 0.000000001f);
                 for (int j = 0; j < data.Rows; j++) {
                     data.Data[j, i] = dimention.Data[j, 0];
@@ -564,7 +564,7 @@ namespace TugasAkhir
                 SVM model = new SVM();
                 model.Type = SVM.SvmType.CSvc;
                 model.SetKernel(SVM.SvmKernelType.Poly);
-                model.TermCriteria = new MCvTermCriteria(10000, 0.000001);
+                model.TermCriteria = new MCvTermCriteria(1000000, 0.000001);
                 model.Degree = 1;
                 model.C = 1;
                 model.Coef0 = 1;
@@ -584,10 +584,10 @@ namespace TugasAkhir
                     if (hasil == responseFold.Data[i, 0])
                         acc++;
                 }
-                Mat supFec = model.GetSupportVectors();
+                /*Mat supFec = model.GetSupportVectors();
                 Matrix<float> supFecNew = new Matrix<float>(supFec.Rows, supFec.Cols);
                 supFec.CopyTo(supFecNew);
-                /*for (int i = 0; i < supFecNew.Rows; i++) {
+                for (int i = 0; i < supFecNew.Rows; i++) {
                     for (int j = 0; j < supFecNew.Cols; j++) {
                         Console.WriteLine("[" + i + ", " + j + "] = " + supFecNew.Data[i, j]);
                     }

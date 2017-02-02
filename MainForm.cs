@@ -62,15 +62,15 @@ namespace TugasAkhir
             Matrix<float> leshFeature = glcm.featureGLCM(localEnergy.Convert<int>());
             MCvScalar meanVec = new MCvScalar();
             MCvScalar stdVec = new MCvScalar();
-            for (int i = 0; i < leshFeature.Cols; i++)
-                Console.WriteLine(i + " " + leshFeature.Data[0, i]);
+            /*for (int i = 0; i < leshFeature.Cols; i++)
+                Console.WriteLine(i + " " + leshFeature.Data[0, i]);*/
             Matrix<float> dimention = leshFeature.GetRow(0);
             CvInvoke.MeanStdDev(leshFeature.Clone().Transpose(), ref meanVec, ref stdVec);
             Console.WriteLine(meanVec.V0 + " " + stdVec.V0);
             dimention = (dimention.Clone() - meanVec.V0) / (stdVec.V0 + 0.000000001f);
-            for (int i = 0; i < leshFeature.Cols; i++) {
+            /*for (int i = 0; i < leshFeature.Cols; i++) {
                 Console.WriteLine(i + " " + dimention.Data[0, i]);
-            }
+            }*/
 
             /*for (int i = 0; i < localEnergy.Rows; i++)
             {
