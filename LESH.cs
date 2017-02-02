@@ -10,7 +10,7 @@ namespace TugasAkhir
 {
     class LESH
     {
-        public Matrix<double> calc_LESH(Image<Gray, double> im) {
+        public Matrix<float> calc_LESH(Image<Gray, double> im) {
             // Load parameter
             int w = 4;          // image will be partitioned in w x w partitions
             int n_orient = 8;
@@ -78,27 +78,28 @@ namespace TugasAkhir
                 }
             }
 
-            using (Matrix<double> tempShapeVect = Shape_vect.Clone()) {
+            /*using (Matrix<double> tempShapeVect = Shape_vect.Clone()) {
                 Shape_vect = (tempShapeVect - Utillity.minVal(tempShapeVect)) / (Utillity.maxVal(tempShapeVect) - Utillity.minVal(tempShapeVect));
-            }
+            }*/
 
             for (int i = 0; i < Shape_vect.Cols; i++) {
                 if (Double.IsNaN(Shape_vect.Data[0, i]))
                     Shape_vect.Data[0, i] = 0;
             }
 
-            using (Matrix<double> tempShapeVect = Shape_vect.Clone())
+            /*using (Matrix<double> tempShapeVect = Shape_vect.Clone())
             {
                 Shape_vect = ((tempShapeVect - Utillity.minVal(tempShapeVect)) * (1 - (-1)) / (Utillity.maxVal(tempShapeVect) - Utillity.minVal(tempShapeVect))) + (-1);
-            }
+            }*/
             DBWavelet db = new DBWavelet();
             db.FWT(ref Shape_vect);
-            Matrix<double> selectedLESH = Shape_vect.GetCols(0, Shape_vect.Cols/2);
+            Matrix<float> selectedLESH = Shape_vect.GetCols(0, Shape_vect.Cols/2).Convert<float>();
 
-            using (Matrix<double> tempShapeVect = selectedLESH.Clone())
+            /*using (Matrix<double> tempShapeVect = selectedLESH.Clone())
             {
                 selectedLESH = ((tempShapeVect - Utillity.minVal(tempShapeVect)) / (Utillity.maxVal(tempShapeVect) - Utillity.minVal(tempShapeVect)));
-            }
+            }*/
+
             return selectedLESH;
         }
     }

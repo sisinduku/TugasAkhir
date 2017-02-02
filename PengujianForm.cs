@@ -356,19 +356,19 @@ namespace TugasAkhir
         }
 
         // Fungsi untuk ekstraksi fitur
-        List<Matrix<double>> extractFeature(ArrayList roiImage, BackgroundWorker worker, DoWorkEventArgs e)
+        List<Matrix<float>> extractFeature(ArrayList roiImage, BackgroundWorker worker, DoWorkEventArgs e)
         {
             int totalImageCount = roiImage.Count;
             int i = 1;
             int highestPercentageReached = 0;
-            List<Matrix<double>> leshFeatures = new List<Matrix<double>>();
+            List<Matrix<float>> leshFeatures = new List<Matrix<float>>();
 
             LESH leshExtractor = new LESH();
             foreach (ArrayList container in roiImage)
             {
                 Console.WriteLine((string)container[0]);
                 Image<Gray, double> im = (Image<Gray, double>)container[1];
-                Matrix<double> leshFeature = leshExtractor.calc_LESH(im);
+                Matrix<float> leshFeature = leshExtractor.calc_LESH(im);
                 leshFeatures.Add(leshFeature);
 
                 int percentComplete = (int)((float)i / (float)totalImageCount * 100);

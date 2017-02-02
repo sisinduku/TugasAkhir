@@ -43,10 +43,10 @@ namespace TugasAkhir
             //image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>().CopyTo(img);
             List<Matrix<double>> PC = new List<Matrix<double>>();
             PhaseCong2 phaseCongruency = new PhaseCong2();
-            phaseCongruency.calcPhaseCong2(image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>(), PC, new Matrix<double>(radius / 2, radius / 2));
-            Matrix<double> localEnergy = new Matrix<double>(PC[0].Rows, PC[0].Cols);
+            //phaseCongruency.calcPhaseCong2(image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>(), PC, new Matrix<double>(radius / 2, radius / 2));
+            //Matrix<double> localEnergy = new Matrix<double>(PC[0].Rows, PC[0].Cols);
             //Matrix<float> feature = glcm.calc_GLCM(image.Copy(new Rectangle(x, y, radius/2, radius/2)).Convert<Gray, double>(), 0);
-            for (int i = 0; i < PC.Count; i++)
+            /*for (int i = 0; i < PC.Count; i++)
             {
                 localEnergy += PC[i];
             }
@@ -60,13 +60,13 @@ namespace TugasAkhir
                 localEnergy = (tempShapeVect - min) * 255 / (max - min);
             }
 
-            for (int i = 0; i < localEnergy.Rows; i++)
+            /*for (int i = 0; i < localEnergy.Rows; i++)
             {
                 for (int j = 0; j < localEnergy.Cols; j++)
                 {
                     Console.WriteLine("[" + (i + 1) + ", " + (j + 1) + "] = " + localEnergy.Convert<int>().Data[i, j]);
                 }
-            }
+            }*/
             //Matrix<double> feature = lesh.calc_LESH(image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>());
             /*for (int i = 0; i < feature.Cols; i++) {
                 Console.WriteLine(feature.Data[0, i]);

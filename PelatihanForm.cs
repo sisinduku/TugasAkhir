@@ -23,7 +23,7 @@ namespace TugasAkhir
     {
         private Hashtable listImage;
         private ArrayList roiImage = new ArrayList();
-        private List<Matrix<double>> featureList = new List<Matrix<double>>();
+        private List<Matrix<float>> featureList = new List<Matrix<float>>();
         private List<string> classes = new List<string>();
         SVM modelSVM = new SVM();
 
@@ -304,16 +304,16 @@ namespace TugasAkhir
         }
 
         // Fungsi ekstraksi fitur
-        List<Matrix<double>> extractFeature(ArrayList roiImage, BackgroundWorker worker, DoWorkEventArgs e) {
+        List<Matrix<float>> extractFeature(ArrayList roiImage, BackgroundWorker worker, DoWorkEventArgs e) {
             int totalImageCount = roiImage.Count;
             int i = 1;
             int highestPercentageReached = 0;
-            List<Matrix<double>> leshFeatures = new List<Matrix<double>>();
+            List<Matrix<float>> leshFeatures = new List<Matrix<float>>();
 
             LESH leshExtractor = new LESH();
             foreach (ArrayList container in roiImage) {
                 Image<Gray, double> im = (Image<Gray, double>)container[1];
-                Matrix<double> leshFeature = leshExtractor.calc_LESH(im);
+                Matrix<float> leshFeature = leshExtractor.calc_LESH(im);
                 leshFeatures.Add(leshFeature);
 
                 int percentComplete = (int)((float)i / (float)totalImageCount * 100);
@@ -358,7 +358,7 @@ namespace TugasAkhir
             {
                 // Finally, handle the case where the operation 
                 // succeeded.
-                featureList = (List<Matrix<double>>)e.Result;
+                featureList = (List<Matrix<float>>)e.Result;
 
                 Console.WriteLine(featureList.Count);
                 metroButton7.Enabled = true;
@@ -381,12 +381,12 @@ namespace TugasAkhir
         }
 
         // Fungsi untuk melatih SVM
-        SVM trainSVM(List<Matrix<double>> samples, List<string> classes, BackgroundWorker worker, DoWorkEventArgs e) {
+        SVM trainSVM(List<Matrix<float>> samples, List<string> classes, BackgroundWorker worker, DoWorkEventArgs e) {
             int count = 0;
 
             // Initialize Sample
             Matrix<float> data = new Matrix<float>(samples.Count, samples[0].Cols);
-            foreach (Matrix<double> sample in samples) {
+            foreach (Matrix<float> sample in samples) {
                 for (int cols = 0; cols < sample.Cols; cols++) {
                     data.Data[count, cols] = Convert.ToSingle(sample.Data[0, cols]);
                 }

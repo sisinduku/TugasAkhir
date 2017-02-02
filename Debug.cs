@@ -20,7 +20,7 @@ namespace TugasAkhir
     {
         private Hashtable listImage;
         private ArrayList roiImage = new ArrayList();
-        private List<Matrix<double>> featureList = new List<Matrix<double>>();
+        private List<Matrix<float>> featureList = new List<Matrix<float>>();
         private List<string> classes = new List<string>();
         SVM modelSVM = new SVM();
 
@@ -230,6 +230,7 @@ namespace TugasAkhir
             System.IO.StreamReader file =
                 new System.IO.StreamReader(paths);
 
+            //PhaseCong2 phasecong = new PhaseCong2();
             while ((line = file.ReadLine()) != null)
             {
                 Hashtable image = new Hashtable();
@@ -258,12 +259,28 @@ namespace TugasAkhir
                         float jejari = radius / 2;
                         int x = Convert.ToInt32(Int32.Parse(elements[4]) - jejari);
                         int y = Convert.ToInt32(1024 - Int32.Parse(elements[5]) - jejari);
-
+                        /*List<Matrix<double>> pc = new List<Matrix<double>>();
+                        Matrix<double> or = new Matrix<double>(radius, radius);
+                        Matrix<double> localEnergy = new Matrix<double>(radius, radius);*/
                         Image<Gray, double> newImage = My_Image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>();
-
+                        /*phasecong.calcPhaseCong2(newImage, pc, or);
+                        or.Dispose();
+                        for (int ort = 0; ort < pc.Count; ort++)
+                        {
+                            localEnergy += pc[ort];
+                        }
+                        using (Matrix<double> tempShapeVect = localEnergy.Clone())
+                        {
+                            double max = 0, min = 0;
+                            Point x0 = new Point();
+                            Point y0 = new Point();
+                            CvInvoke.MinMaxLoc(tempShapeVect, ref min, ref max, ref x0, ref y0);
+                            localEnergy = (tempShapeVect - min) * 255 / (max - min);
+                        }*/
                         container.Add(elements[0]);                 // File name
-                        container.Add(newImage);                    // Image
+                        container.Add(newImage);                    // Image                        
                         container.Add(elements[2]);                 // Calsification
+                        //container.Add(localEnergy.Clone().Convert<int>()); // Image
                         result.Add(container);
 
                         int percentComplete = (int)((float)i / (float)totalImageCount * 100);
@@ -344,18 +361,18 @@ namespace TugasAkhir
         }
 
         // Fungsi ekstraksi fitur
-        List<Matrix<double>> extractFeature(ArrayList roiImage, BackgroundWorker worker, DoWorkEventArgs e)
+        List<Matrix<float>> extractFeature(ArrayList roiImage, BackgroundWorker worker, DoWorkEventArgs e)
         {
             int totalImageCount = roiImage.Count;
             int i = 1;
             int highestPercentageReached = 0;
-            List<Matrix<double>> leshFeatures = new List<Matrix<double>>();
+            List<Matrix<float>> leshFeatures = new List<Matrix<float>>();
 
             LESH leshExtractor = new LESH();
             foreach (ArrayList container in roiImage)
             {
                 Image<Gray, double> im = (Image<Gray, double>)container[1];
-                Matrix<double> leshFeature = leshExtractor.calc_LESH(im);
+                Matrix<float> leshFeature = leshExtractor.calc_LESH(im);
                 leshFeatures.Add(leshFeature);
 
                 int percentComplete = (int)((float)i / (float)totalImageCount * 100);
@@ -400,7 +417,7 @@ namespace TugasAkhir
             {
                 // Finally, handle the case where the operation 
                 // succeeded.
-                featureList = (List<Matrix<double>>)e.Result;
+                featureList = (List<Matrix<float>>)e.Result;
 
                 Console.WriteLine(featureList.Count);
                 metroButton6.Enabled = true;
@@ -426,19 +443,31 @@ namespace TugasAkhir
         }
 
         // Fungsi untuk melatih SVM
-        void evaluateSVM(List<Matrix<double>> samples, List<string> classes, BackgroundWorker worker, DoWorkEventArgs e)
+        void evaluateSVM(List<Matrix<float>> samples, List<string> classes, BackgroundWorker worker, DoWorkEventArgs e)
         {
             int highestPercentageReached = 0;
             // Initialize Sample
             Matrix<float> data = new Matrix<float>(samples.Count, samples[0].Cols);
             int count = 0;
-            foreach (Matrix<double> sample in samples)
+            foreach (Matrix<float> sample in samples)
             {
                 for (int cols = 0; cols < sample.Cols; cols++)
                 {
-                    data.Data[count, cols] = Convert.ToSingle(sample.Data[0, cols]);
+                    data.Data[count, cols] = sample.Data[0, cols];
                 }
                 count++;
+            }
+
+            for (int i = 0; i < data.Cols; i++) {
+                Matrix<float> dimention = data.GetCol(i);
+                MCvScalar mean = new MCvScalar();
+                MCvScalar std = new MCvScalar();
+                CvInvoke.MeanStdDev(dimention, ref mean, ref std);
+
+                dimention = (dimention - mean.V0) / std.V0;
+                for (int j = 0; j < data.Rows; j++) {
+                    data.Data[j, i] = dimention.Data[j, 0];
+                }
             }
 
             // Initialize response
@@ -523,7 +552,7 @@ namespace TugasAkhir
                 SVM model = new SVM();
                 model.Type = SVM.SvmType.CSvc;
                 model.SetKernel(SVM.SvmKernelType.Poly);
-                model.TermCriteria = new MCvTermCriteria(10000, 0.000001);
+                model.TermCriteria = new MCvTermCriteria(1000000, 0.0000001);
                 model.Degree = 1;
                 model.C = 1;
                 model.Coef0 = 1;
