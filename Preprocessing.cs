@@ -33,6 +33,9 @@ namespace TugasAkhir
 
             /*CvInvoke.FastNlMeansDenoising(result.Clone(), result, 3, 7, 21);
             */
+
+            MCvScalar bor = new MCvScalar();
+            CvInvoke.MorphologyEx(result.Clone(), result, Emgu.CV.CvEnum.MorphOp.Close, new Mat(), new Point(-1, -1), 1, Emgu.CV.CvEnum.BorderType.Reflect101, bor);
             return result;
         }
     }
