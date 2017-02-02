@@ -31,7 +31,7 @@ namespace TugasAkhir
             //Image<Gray, double> newIm = image.Convert<Gray, double>().Copy();
             //CvInvoke.Normalize(newIm.Copy(), newIm, 1, 0);
             //newIm.Convert<Gray, byte>().CopyTo(image);
-            //CLAHEImage = Preprocessing.enhanceImage(image);
+            CLAHEImage = Preprocessing.enhanceImage(image);
             //CvInvoke.CLAHE(image, 3.56, new Size(8, 8), CLAHEImage);
             int radius = 18 * 2;
             float jejari = radius / 2;

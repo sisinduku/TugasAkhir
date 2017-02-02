@@ -564,7 +564,7 @@ namespace TugasAkhir
                 SVM model = new SVM();
                 model.Type = SVM.SvmType.CSvc;
                 model.SetKernel(SVM.SvmKernelType.Poly);
-                model.TermCriteria = new MCvTermCriteria(1000000, 0.0000001);
+                model.TermCriteria = new MCvTermCriteria(10000, 0.000001);
                 model.Degree = 1;
                 model.C = 1;
                 model.Coef0 = 1;
@@ -587,11 +587,11 @@ namespace TugasAkhir
                 Mat supFec = model.GetSupportVectors();
                 Matrix<float> supFecNew = new Matrix<float>(supFec.Rows, supFec.Cols);
                 supFec.CopyTo(supFecNew);
-                for (int i = 0; i < supFecNew.Rows; i++) {
+                /*for (int i = 0; i < supFecNew.Rows; i++) {
                     for (int j = 0; j < supFecNew.Cols; j++) {
                         Console.WriteLine("[" + i + ", " + j + "] = " + supFecNew.Data[i, j]);
                     }
-                }
+                }*/
                 model.Dispose();
                 Console.WriteLine(((float)acc/(float)testingFold.Rows) * 100);
 
