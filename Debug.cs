@@ -230,7 +230,7 @@ namespace TugasAkhir
             System.IO.StreamReader file =
                 new System.IO.StreamReader(paths);
 
-            //PhaseCong2 phasecong = new PhaseCong2();
+            PhaseCong2 phasecong = new PhaseCong2();
             while ((line = file.ReadLine()) != null)
             {
                 Hashtable image = new Hashtable();
@@ -259,12 +259,11 @@ namespace TugasAkhir
                         float jejari = radius / 2;
                         int x = Convert.ToInt32(Int32.Parse(elements[4]) - jejari);
                         int y = Convert.ToInt32(1024 - Int32.Parse(elements[5]) - jejari);
-                        /*List<Matrix<double>> pc = new List<Matrix<double>>();
+                        List<Matrix<double>> pc = new List<Matrix<double>>();
                         Matrix<double> or = new Matrix<double>(radius, radius);
-                        Matrix<double> localEnergy = new Matrix<double>(radius, radius);*/
+                        Matrix<double> localEnergy = new Matrix<double>(radius, radius);
                         Image<Gray, double> newImage = My_Image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>();
-                        /*phasecong.calcPhaseCong2(newImage, pc, or);
-                        or.Dispose();
+                        phasecong.calcPhaseCong2(newImage.Clone(), pc, or);
                         for (int ort = 0; ort < pc.Count; ort++)
                         {
                             localEnergy += pc[ort];
@@ -276,11 +275,11 @@ namespace TugasAkhir
                             Point y0 = new Point();
                             CvInvoke.MinMaxLoc(tempShapeVect, ref min, ref max, ref x0, ref y0);
                             localEnergy = (tempShapeVect - min) * 255 / (max - min);
-                        }*/
+                        }
                         container.Add(elements[0]);                 // File name
-                        container.Add(newImage);                    // Image                        
+                        container.Add(pc);                          // Phase Congruency                        
                         container.Add(elements[2]);                 // Calsification
-                        //container.Add(localEnergy.Clone().Convert<int>()); // Image
+                        container.Add(localEnergy.Clone().Convert<int>()); // Local Energy
                         result.Add(container);
 
                         int percentComplete = (int)((float)i / (float)totalImageCount * 100);
@@ -366,14 +365,18 @@ namespace TugasAkhir
             int totalImageCount = roiImage.Count;
             int i = 1;
             int highestPercentageReached = 0;
-            List<Matrix<float>> leshFeatures = new List<Matrix<float>>();
+            List<Matrix<float>> features = new List<Matrix<float>>();
 
             LESH leshExtractor = new LESH();
+            GLCM glcmExtractor = new GLCM();
             foreach (ArrayList container in roiImage)
             {
-                Image<Gray, double> im = (Image<Gray, double>)container[1];
-                Matrix<float> leshFeature = leshExtractor.calc_LESH(im);
-                leshFeatures.Add(leshFeature);
+                List<Matrix<double>> pc = (List<Matrix<double>>)container[1];
+                Matrix<int> localEnergy = (Matrix<int>)container[3];
+                Matrix<float> leshFeature = leshExtractor.calcLESHFromPC(pc);
+                Matrix<float> glcmFeature = glcmExtractor.featureGLCM(localEnergy);
+
+                features.Add(leshFeature.ConcateHorizontal(glcmFeature));
 
                 int percentComplete = (int)((float)i / (float)totalImageCount * 100);
 
@@ -385,7 +388,7 @@ namespace TugasAkhir
                 i++;
             }
 
-            return leshFeatures;
+            return features;
         }
 
         // Thread ekstraksi fitur
@@ -464,11 +467,24 @@ namespace TugasAkhir
                 MCvScalar std = new MCvScalar();
                 CvInvoke.MeanStdDev(dimention, ref mean, ref std);
 
-                dimention = (dimention - mean.V0) / std.V0;
+                dimention = (dimention - mean.V0) / (std.V0 + 0.00000001f);
+
+                /*double min = 0;
+                double max = 0;
+                Point x0 = new Point();
+                Point y0 = new Point();
+                CvInvoke.MinMaxLoc(dimention.Clone(), ref min, ref max, ref x0, ref y0);
+                dimention = (dimention.Clone() - min) / (max - min);*/
                 for (int j = 0; j < data.Rows; j++) {
                     data.Data[j, i] = dimention.Data[j, 0];
                 }
             }
+
+            /*for (int i = 0; i < data.Rows; i++) {
+                for (int j = 0; j < data.Cols; j++) {
+                    Console.WriteLine("[" + i + ", " + j + "] = " + data.Data[i, j]);
+                }
+            }*/
 
             // Initialize response
             Matrix<int> response = new Matrix<int>(classes.Count, 1);
@@ -503,8 +519,8 @@ namespace TugasAkhir
 
             for (int fold = 0; fold < 5; fold++) {
                 // Data latih dan testing
-                Matrix<float> dataFold = new Matrix<float>(1, 64);
-                Matrix<float> testingFold = new Matrix<float>(1, 64);
+                Matrix<float> dataFold = new Matrix<float>(1, data.Cols);
+                Matrix<float> testingFold = new Matrix<float>(1, data.Cols);
 
                 // response latih dan testing
                 Matrix<int> targetFold = new Matrix<int>(1, 1);
