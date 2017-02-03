@@ -516,7 +516,7 @@ namespace TugasAkhir
                 }
                 count++;
             }
-
+            float akurasi = 0;
             for (int fold = 0; fold < 5; fold++) {
                 // Data latih dan testing
                 Matrix<float> dataFold = new Matrix<float>(1, data.Cols);
@@ -589,7 +589,7 @@ namespace TugasAkhir
                 }
                 model.Dispose();
                 Console.WriteLine(((float)acc/(float)testingFold.Rows) * 100);
-
+                akurasi += ((float)acc / (float)testingFold.Rows) * 100;
                 int percentComplete = (int)(( (float)(fold + 1) / (float)5 ) * 100);
 
                 if (percentComplete > highestPercentageReached)
@@ -598,6 +598,8 @@ namespace TugasAkhir
                     worker.ReportProgress(percentComplete);
                 }
             }
+            akurasi = ((float)akurasi / 5);
+            Console.WriteLine(akurasi);
         }
 
         // Thread evaluate model
