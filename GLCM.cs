@@ -12,7 +12,7 @@ namespace TugasAkhir
     {
         private float epsilon = 0.0000001f;
         public Matrix<float> featureGLCM(Matrix<int> img) {
-            Matrix<float> result = new Matrix<float>(1, 26);
+            Matrix<float> result = new Matrix<float>(1, 10);
 
             Matrix<float> sudut0 = calc_GLCM(img, 0);
             Matrix<float> sudut45 = calc_GLCM(img, 45);
@@ -20,7 +20,7 @@ namespace TugasAkhir
             Matrix<float> sudut135 = calc_GLCM(img, 135);
 
             int j = 0;
-            for (int i = 0; i < 13; i++) {
+            for (int i = 0; i < 5; i++) {
                 result.Data[0, j] = (sudut0.Data[0, i] + sudut45.Data[0, i] + sudut90.Data[0, i] + sudut135.Data[0, i]) / 4;
                 result.Data[0, j + 1] = Math.Max(Math.Max(sudut0.Data[0, i], sudut45.Data[0, i]), Math.Max(sudut90.Data[0, i], sudut135.Data[0, i])) - Math.Min(Math.Min(sudut0.Data[0, i], sudut45.Data[0, i]), Math.Min(sudut90.Data[0, i], sudut135.Data[0, i]));
                 j += 2;
@@ -67,11 +67,11 @@ namespace TugasAkhir
             }
             
             // normalizing glcm matrix for parameter determination
-            gl = gl + gl.Transpose();
+            gl +=  gl.Transpose();
             gl = gl / CvInvoke.Sum(gl).V0;
 
-            Matrix<float> result = new Matrix<float>(1, 13);
-
+            Matrix<float> result = new Matrix<float>(1, 5);
+            
             // mean = calcMean(gl);
             //float correlation = calcCorrelation(gl, mean);
             //float[] sumdifVariance = calcSumnDifVariance(gl);
@@ -81,12 +81,12 @@ namespace TugasAkhir
 
                 for (int j = 0; j < 256; j++)
                 {
-                    asm = asm + gl.Data[i, j] * gl.Data[i, j];            //finding parameters
-                    contrast = contrast + (i - j) * (i - j) * gl.Data[i, j];
-                    homogenity = homogenity + gl.Data[i, j] / (1 + Math.Abs(i - j));
-                    IDM = IDM + gl.Data[i, j] / (1 + (i - j) * (i - j));
+                    asm += gl.Data[i, j] * gl.Data[i, j];            //finding parameters
+                    contrast += ((i - j) * (i - j) * gl.Data[i, j]);
+                    homogenity += (gl.Data[i, j] / (1 + Math.Abs(i - j)));
+                    IDM += (gl.Data[i, j] / (1 + (i - j) * (i - j)));
                     if (gl.Data[i, j] != 0)
-                        entropy = entropy - gl.Data[i, j] * (float)Math.Log10(Convert.ToDouble(gl.Data[i, j]) + epsilon);
+                        entropy += -(gl.Data[i, j] * (float)Math.Log10(Convert.ToDouble(gl.Data[i, j]) + epsilon));
                     //mean1 = mean1 + 0.5f * (i * gl.Data[i, j] + j * gl.Data[i, j]);
                     pxplusy[i + j] += gl.Data[i, j];
                     pxminy[Math.Abs(i - j)] += gl.Data[i, j];
@@ -142,16 +142,16 @@ namespace TugasAkhir
             result.Data[0, 0] = asm;
             result.Data[0, 1] = contrast;
             result.Data[0, 2] = correlation;
-            result.Data[0, 3] = variance;
-            result.Data[0, 4] = IDM;
-            result.Data[0, 5] = sumAverage;
+            //result.Data[0, 3] = variance;
+            result.Data[0, 3] = IDM;
+            /*result.Data[0, 5] = sumAverage;
             result.Data[0, 6] = sumVariance;
-            result.Data[0, 7] = sumEntropy;
-            result.Data[0, 8] = entropy;
-            result.Data[0, 9] = difVariance;
+            result.Data[0, 7] = sumEntropy;*/
+            result.Data[0, 4] = entropy;
+            /*result.Data[0, 9] = difVariance;
             result.Data[0, 10] = difEntropy;
             result.Data[0, 11] = imc1;
-            result.Data[0, 12] = imc2;
+            result.Data[0, 12] = imc2;*/
             gl.Dispose();
             
             return result;

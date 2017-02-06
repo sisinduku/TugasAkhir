@@ -373,6 +373,10 @@ namespace TugasAkhir
             {
                 Matrix<int> im = (Matrix<int>)container[1];
                 Matrix<float> leshFeature = GLCMExtractor.featureGLCM(im);
+                for (int j = 0; j < leshFeature.Cols; j++)
+                {
+                    Console.WriteLine("[" + 0 + ", " + j + "] = " + leshFeature.Data[0, j]);
+                }
                 GLCMFeatures.Add(leshFeature);
 
                 int percentComplete = (int)((float)i / (float)totalImageCount * 100);
@@ -459,7 +463,7 @@ namespace TugasAkhir
                 count++;
             }
 
-            for (int i = 0; i < data.Cols; i++) {
+            /*for (int i = 0; i < data.Cols; i++) {
                 Matrix<float> dimention = data.GetCol(i);
                 MCvScalar meanVec = new MCvScalar();
                 MCvScalar stdVec = new MCvScalar();
@@ -468,13 +472,13 @@ namespace TugasAkhir
                 Point x0 = new Point();
                 Point y0 = new Point();
                 CvInvoke.MinMaxLoc(dimention.Clone(), ref min, ref max, ref x0, ref y0);
-                dimention = (dimention.Clone() - min) / (max - min);*/
+                dimention = (dimention.Clone() - min) / (max - min);
                 CvInvoke.MeanStdDev(dimention.Clone(), ref meanVec, ref stdVec);
                 dimention = (dimention.Clone() - meanVec.V0) / (stdVec.V0 + 0.000000001f);
                 for (int j = 0; j < data.Rows; j++) {
                     data.Data[j, i] = dimention.Data[j, 0];
                 }
-            }
+            }*/
 
             /*for (int i = 0; i < data.Rows; i++) {
                 for (int j = 0; j < data.Cols; j++) {
@@ -512,11 +516,11 @@ namespace TugasAkhir
                 }
                 count++;
             }
-
+            float akurasi = 0;
             for (int fold = 0; fold < 5; fold++) {
                 // Data latih dan testing
-                Matrix<float> dataFold = new Matrix<float>(1, 26);
-                Matrix<float> testingFold = new Matrix<float>(1, 26);
+                Matrix<float> dataFold = new Matrix<float>(1, data.Cols);
+                Matrix<float> testingFold = new Matrix<float>(1, data.Cols);
 
                 // response latih dan testing
                 Matrix<int> targetFold = new Matrix<int>(1, 1);
@@ -594,7 +598,7 @@ namespace TugasAkhir
                 }*/
                 model.Dispose();
                 Console.WriteLine(((float)acc/(float)testingFold.Rows) * 100);
-
+                akurasi += ((float)acc / (float)testingFold.Rows) * 100;
                 int percentComplete = (int)(( (float)(fold + 1) / (float)5 ) * 100);
 
                 if (percentComplete > highestPercentageReached)
@@ -603,6 +607,8 @@ namespace TugasAkhir
                     worker.ReportProgress(percentComplete);
                 }
             }
+            akurasi = akurasi / 5;
+            Console.WriteLine(akurasi);
         }
 
         // Thread evaluate model
