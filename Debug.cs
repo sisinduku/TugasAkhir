@@ -458,7 +458,7 @@ namespace TugasAkhir
                 count++;
             }
 
-            for (int i = 0; i < data.Cols; i++) {
+            /*for (int i = 0; i < data.Cols; i++) {
                 Matrix<float> dimention = data.GetCol(i);
                 MCvScalar mean = new MCvScalar();
                 MCvScalar std = new MCvScalar();
@@ -468,7 +468,7 @@ namespace TugasAkhir
                 for (int j = 0; j < data.Rows; j++) {
                     data.Data[j, i] = dimention.Data[j, 0];
                 }
-            }
+            }*/
 
             // Initialize response
             Matrix<int> response = new Matrix<int>(classes.Count, 1);
@@ -503,8 +503,8 @@ namespace TugasAkhir
 
             for (int fold = 0; fold < 5; fold++) {
                 // Data latih dan testing
-                Matrix<float> dataFold = new Matrix<float>(1, 64);
-                Matrix<float> testingFold = new Matrix<float>(1, 64);
+                Matrix<float> dataFold = new Matrix<float>(1, data.Cols);
+                Matrix<float> testingFold = new Matrix<float>(1, data.Cols);
 
                 // response latih dan testing
                 Matrix<int> targetFold = new Matrix<int>(1, 1);

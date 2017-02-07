@@ -2,6 +2,7 @@
 using Emgu.CV.Structure;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -78,9 +79,13 @@ namespace TugasAkhir
                 }
             }
 
-            /*using (Matrix<double> tempShapeVect = Shape_vect.Clone()) {
-                Shape_vect = (tempShapeVect - Utillity.minVal(tempShapeVect)) / (Utillity.maxVal(tempShapeVect) - Utillity.minVal(tempShapeVect));
-            }*/
+            double min = 0, max = 0;
+            Point minLoc = new Point();
+            Point maxLoc = new Point();
+            CvInvoke.MinMaxLoc(Shape_vect, ref min, ref max, ref minLoc, ref maxLoc);
+            using (Matrix<double> tempShapeVect = Shape_vect.Clone()) {
+                Shape_vect = (tempShapeVect - min) / (max - min);
+            }
 
             for (int i = 0; i < Shape_vect.Cols; i++) {
                 if (Double.IsNaN(Shape_vect.Data[0, i]))
@@ -90,7 +95,7 @@ namespace TugasAkhir
             /*using (Matrix<double> tempShapeVect = Shape_vect.Clone())
             {
                 Shape_vect = ((tempShapeVect - Utillity.minVal(tempShapeVect)) * (1 - (-1)) / (Utillity.maxVal(tempShapeVect) - Utillity.minVal(tempShapeVect))) + (-1);
-            }*/
+            }
             DBWavelet db = new DBWavelet();
             db.FWT(ref Shape_vect);
             Matrix<float> selectedLESH = Shape_vect.GetCols(0, Shape_vect.Cols/2).Convert<float>();
@@ -100,7 +105,7 @@ namespace TugasAkhir
                 selectedLESH = ((tempShapeVect - Utillity.minVal(tempShapeVect)) / (Utillity.maxVal(tempShapeVect) - Utillity.minVal(tempShapeVect)));
             }*/
 
-            return selectedLESH;
+            return Shape_vect.Convert<float>();
         }
     }
 }
