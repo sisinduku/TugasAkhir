@@ -39,8 +39,13 @@ namespace TugasAkhir
             int y = Convert.ToInt32(1024 - 766 - jejari);
             //imageBox1.Image = CLAHEImage;
             imageBox1.Image = CLAHEImage.Copy(new Rectangle(x, y, radius, radius));
-            //Matrix<double> img = new Matrix<double>(radius, radius);
-            //image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>().CopyTo(img);
+            Image<Gray, double> img = new Image<Gray, double>(radius, radius);
+            CLAHEImage.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>().CopyTo(img);
+            Matrix<float> feature = lesh.calc_LESH(img);
+            for (int i = 0; i < feature.Cols; i++)
+            {
+                Console.WriteLine("[" + i + "] " + feature.Data[0, i]);
+            }
             List<Matrix<double>> PC = new List<Matrix<double>>();
             PhaseCong2 phaseCongruency = new PhaseCong2();
             //phaseCongruency.calcPhaseCong2(image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>(), PC, new Matrix<double>(radius / 2, radius / 2));

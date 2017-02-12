@@ -95,17 +95,41 @@ namespace TugasAkhir
             /*using (Matrix<double> tempShapeVect = Shape_vect.Clone())
             {
                 Shape_vect = ((tempShapeVect - Utillity.minVal(tempShapeVect)) * (1 - (-1)) / (Utillity.maxVal(tempShapeVect) - Utillity.minVal(tempShapeVect))) + (-1);
-            }
+            }*/
             DBWavelet db = new DBWavelet();
             db.FWT(ref Shape_vect);
-            Matrix<float> selectedLESH = Shape_vect.GetCols(0, Shape_vect.Cols/2).Convert<float>();
-
+            //Matrix<float> selectedLESH = Shape_vect.GetCols(0, Shape_vect.Cols/2).Convert<float>();
+            Matrix<float> selectedLESH = new Matrix<float>(1, 70);
             /*using (Matrix<double> tempShapeVect = selectedLESH.Clone())
             {
                 selectedLESH = ((tempShapeVect - Utillity.minVal(tempShapeVect)) / (Utillity.maxVal(tempShapeVect) - Utillity.minVal(tempShapeVect)));
             }*/
 
-            return Shape_vect.Convert<float>();
+            List<float> dataList = new List<float>();
+            using (Matrix<float> temp = Shape_vect.Convert<float>())
+                for (int i = 0; i < temp.Cols; i++)
+                    dataList.Add(temp.Data[0, i]);
+
+            var sorted = dataList
+                .Select((x, i) => new KeyValuePair<float, int>(x, i))
+                .OrderBy(x => x.Key)
+                .ToList();
+
+            List<int> idxNew = sorted.Select(x => x.Value).ToList().GetRange(57, 70);
+            
+            var sortedIdx = idxNew
+                .Select((x, i) => new KeyValuePair<int, int>(x, i))
+                .OrderBy(x => x.Key)
+                .ToList();
+
+            List<int> indeks = sortedIdx.Select(x => x.Key).ToList();
+            using (Matrix<float> temp = Shape_vect.Convert<float>()) {
+                for (int i = 0; i < indeks.Count; i++)
+                {
+                    selectedLESH.Data[0, i] = temp.Data[0, indeks[i]];
+                }
+            }
+            return selectedLESH;
         }
     }
 }
