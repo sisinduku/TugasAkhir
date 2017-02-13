@@ -533,8 +533,8 @@ namespace TugasAkhir
                 model.Type = SVM.SvmType.CSvc;
                 model.SetKernel(SVM.SvmKernelType.Rbf);
                 model.TermCriteria = new MCvTermCriteria(10000000, 0.0000001);
-                model.Degree = 0.5;
-                model.C = 2;
+                model.Degree = 3;
+                model.C = 3;
                 //model.Coef0 = 1;
                 //model.Gamma = 1;
 
