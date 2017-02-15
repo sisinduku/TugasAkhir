@@ -39,13 +39,13 @@ namespace TugasAkhir
             int y = Convert.ToInt32(1024 - 766 - jejari);
             //imageBox1.Image = CLAHEImage;
             imageBox1.Image = CLAHEImage.Copy(new Rectangle(x, y, radius, radius));
-            //Matrix<double> img = new Matrix<double>(radius, radius);
-            //image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>().CopyTo(img);
+            Matrix<int> img = new Matrix<int>(radius, radius);
+            CLAHEImage.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, int>().CopyTo(img);
             List<Matrix<double>> PC = new List<Matrix<double>>();
             PhaseCong2 phaseCongruency = new PhaseCong2();
             //phaseCongruency.calcPhaseCong2(image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>(), PC, new Matrix<double>(radius / 2, radius / 2));
             //Matrix<double> localEnergy = new Matrix<double>(PC[0].Rows, PC[0].Cols);
-            //Matrix<float> feature = glcm.calc_GLCM(image.Copy(new Rectangle(x, y, radius/2, radius/2)).Convert<Gray, double>(), 0);
+            Matrix<float> feature = glcm.featureGLCM(img);
             /*for (int i = 0; i < PC.Count; i++)
             {
                 localEnergy += PC[i];
@@ -68,9 +68,9 @@ namespace TugasAkhir
                 }
             }*/
             //Matrix<double> feature = lesh.calc_LESH(image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>());
-            /*for (int i = 0; i < feature.Cols; i++) {
+            for (int i = 0; i < feature.Cols; i++) {
                 Console.WriteLine(feature.Data[0, i]);
-            }*/
+            }
             /*Matrix <double> img = new Matrix<double>(image.Rows, image.Cols);
             //image.CopyTo(img);
             //double testing = Utillity.median(img);

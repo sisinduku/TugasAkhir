@@ -230,7 +230,6 @@ namespace TugasAkhir
             System.IO.StreamReader file =
                 new System.IO.StreamReader(paths);
 
-            //PhaseCong2 phasecong = new PhaseCong2();
             while ((line = file.ReadLine()) != null)
             {
                 Hashtable image = new Hashtable();
@@ -259,30 +258,15 @@ namespace TugasAkhir
                         float jejari = radius / 2;
                         int x = Convert.ToInt32(Int32.Parse(elements[4]) - jejari);
                         int y = Convert.ToInt32(1024 - Int32.Parse(elements[5]) - jejari);
-                        /*List<Matrix<double>> pc = new List<Matrix<double>>();
-                        Matrix<double> or = new Matrix<double>(radius, radius);
-                        Matrix<double> localEnergy = new Matrix<double>(radius, radius);*/
-                        Image<Gray, double> newImage = My_Image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>();
-                        /*phasecong.calcPhaseCong2(newImage, pc, or);
-                        or.Dispose();
-                        for (int ort = 0; ort < pc.Count; ort++)
-                        {
-                            localEnergy += pc[ort];
-                        }
-                        using (Matrix<double> tempShapeVect = localEnergy.Clone())
-                        {
-                            double max = 0, min = 0;
-                            Point x0 = new Point();
-                            Point y0 = new Point();
-                            CvInvoke.MinMaxLoc(tempShapeVect, ref min, ref max, ref x0, ref y0);
-                            localEnergy = (tempShapeVect - min) * 255 / (max - min);
-                        }*/
-                        container.Add(elements[0]);                 // File name
-                        container.Add(newImage);                    // Image                        
-                        container.Add(elements[2]);                 // Calsification
-                        //container.Add(localEnergy.Clone().Convert<int>()); // Image
+                        Matrix<double> localEnergy = new Matrix<double>(radius, radius);
+                        Image<Gray, int> im = My_Image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, int>();
+                        Matrix<int> newImage = new Matrix<int>(radius, radius);
+                        im.CopyTo(newImage);
+                        container.Add(elements[0]);                                // File name
+                        container.Add(newImage);                                    // Image
+                        container.Add(elements[3]);                                // Calsification
                         result.Add(container);
-
+                        localEnergy.Dispose();
                         int percentComplete = (int)((float)i / (float)totalImageCount * 100);
 
                         if (percentComplete > highestPercentageReached)
@@ -366,14 +350,21 @@ namespace TugasAkhir
             int totalImageCount = roiImage.Count;
             int i = 1;
             int highestPercentageReached = 0;
-            List<Matrix<float>> leshFeatures = new List<Matrix<float>>();
+            List<Matrix<float>> GLCMFeatures = new List<Matrix<float>>();
 
-            LESH leshExtractor = new LESH();
+            GLCM GLCMExtractor = new GLCM();
             foreach (ArrayList container in roiImage)
             {
-                Image<Gray, double> im = (Image<Gray, double>)container[1];
-                Matrix<float> leshFeature = leshExtractor.calc_LESH(im);
-                leshFeatures.Add(leshFeature);
+                Matrix<int> im = (Matrix<int>)container[1];
+                Console.WriteLine(i);
+                Matrix<float> leshFeature = GLCMExtractor.calc_GLCM(im, 90);
+                
+                for (int j = 0; j < leshFeature.Cols; j++)
+                {
+                    Console.WriteLine(" [" + 0 + ", " + j + "] = " + leshFeature.Data[0, j]);
+                }
+                Console.WriteLine();
+                GLCMFeatures.Add(leshFeature);
 
                 int percentComplete = (int)((float)i / (float)totalImageCount * 100);
 
@@ -385,7 +376,7 @@ namespace TugasAkhir
                 i++;
             }
 
-            return leshFeatures;
+            return GLCMFeatures;
         }
 
         // Thread ekstraksi fitur
@@ -458,17 +449,16 @@ namespace TugasAkhir
                 count++;
             }
 
-            /*for (int i = 0; i < data.Cols; i++) {
+            for (int i = 0; i < data.Cols; i++) {
                 Matrix<float> dimention = data.GetCol(i);
                 MCvScalar mean = new MCvScalar();
                 MCvScalar std = new MCvScalar();
                 CvInvoke.MeanStdDev(dimention, ref mean, ref std);
-
                 dimention = (dimention - mean.V0) / std.V0;
                 for (int j = 0; j < data.Rows; j++) {
                     data.Data[j, i] = dimention.Data[j, 0];
                 }
-            }*/
+            }
 
             // Initialize response
             Matrix<int> response = new Matrix<int>(classes.Count, 1);
@@ -479,29 +469,18 @@ namespace TugasAkhir
                 //Console.WriteLine(kelas);
                 switch (kelas)
                 {
-                    case "CALC":
-                        response.Data[count, 0] = 0;
-                        break;
-                    case "CIRC":
+                    case "M":
                         response.Data[count, 0] = 1;
                         break;
-                    case "SPIC":
-                        response.Data[count, 0] = 2;
-                        break;
-                    case "MISC":
-                        response.Data[count, 0] = 3;
-                        break;
-                    case "ARCH":
-                        response.Data[count, 0] = 4;
-                        break;
-                    case "ASYM":
-                        response.Data[count, 0] = 5;
+                    case "B":
+                        response.Data[count, 0] = 0;
                         break;
                 }
                 count++;
             }
-
-            for (int fold = 0; fold < 5; fold++) {
+            float akurasi = 0;
+            for (int fold = 0; fold < 10; fold++)
+            {
                 // Data latih dan testing
                 Matrix<float> dataFold = new Matrix<float>(1, data.Cols);
                 Matrix<float> testingFold = new Matrix<float>(1, data.Cols);
@@ -509,22 +488,24 @@ namespace TugasAkhir
                 // response latih dan testing
                 Matrix<int> targetFold = new Matrix<int>(1, 1);
                 Matrix<int> responseFold = new Matrix<int>(1, 1);
-                for (int kelas = 0; kelas < 6; kelas++) {
-                    if (fold != 0) {
-                        Matrix<float> dataKelas = data.GetRows((kelas * 15), (kelas * 15) + (fold * 3), 1).Clone();
+                for (int kelas = 0; kelas < 2; kelas++)
+                {
+                    if (fold != 0)
+                    {
+                        Matrix<float> dataKelas = data.GetRows((kelas * 50), (kelas * 50) + (fold * 5), 1).Clone();
                         dataFold = dataFold.ConcateVertical(dataKelas).Clone();
-                        Matrix<int> targetKelas = response.GetRows((kelas * 15), (kelas * 15) + (fold * 3), 1).Clone();
+                        Matrix<int> targetKelas = response.GetRows((kelas * 50), (kelas * 50) + (fold * 5), 1).Clone();
                         targetFold = targetFold.ConcateVertical(targetKelas).Clone();
                     }
-                    Matrix<float> testingKelas = data.GetRows((kelas * 15) + (fold * 3), 3 + (kelas * 15) + (fold * 3), 1).Clone();
+                    Matrix<float> testingKelas = data.GetRows((kelas * 50) + (fold * 5), 5 + (kelas * 50) + (fold * 5), 1).Clone();
                     testingFold = testingFold.ConcateVertical(testingKelas).Clone();
-                    Matrix<int> responseKelas = response.GetRows((kelas * 15) + (fold * 3), 3 + (kelas * 15) + (fold * 3), 1).Clone();
+                    Matrix<int> responseKelas = response.GetRows((kelas * 50) + (fold * 5), 5 + (kelas * 50) + (fold * 5), 1).Clone();
                     responseFold = responseFold.ConcateVertical(responseKelas).Clone();
-                    if (fold != 4)
+                    if (fold != 9)
                     {
-                        Matrix<float> dataKelas = data.GetRows(3 + (kelas * 15) + (fold * 3), ((kelas + 1) * 15), 1).Clone();
+                        Matrix<float> dataKelas = data.GetRows(5 + (kelas * 50) + (fold * 5), ((kelas + 1) * 50), 1).Clone();
                         dataFold = dataFold.ConcateVertical(dataKelas).Clone();
-                        Matrix<int> targetKelas = response.GetRows(3 + (kelas * 15) + (fold * 3), ((kelas + 1) * 15), 1).Clone();
+                        Matrix<int> targetKelas = response.GetRows(5 + (kelas * 50) + (fold * 5), ((kelas + 1) * 50), 1).Clone();
                         targetFold = targetFold.ConcateVertical(targetKelas).Clone();
                     }
                 }
@@ -534,6 +515,7 @@ namespace TugasAkhir
                 targetFold = targetFold.RemoveRows(0, 1).Clone();
                 responseFold = responseFold.RemoveRows(0, 1).Clone();
 
+                Console.WriteLine("Fold-" + (fold+1));
                 Console.WriteLine("train " + dataFold.Rows + " " + dataFold.Cols);
                 Console.WriteLine("testing " + testingFold.Rows + " " + testingFold.Cols);
                 Console.WriteLine("target train " + targetFold.Rows + " " + targetFold.Cols);
@@ -551,37 +533,45 @@ namespace TugasAkhir
                 // Initialize SVM
                 SVM model = new SVM();
                 model.Type = SVM.SvmType.CSvc;
-                model.SetKernel(SVM.SvmKernelType.Poly);
-                model.TermCriteria = new MCvTermCriteria(1000000, 0.0000001);
-                model.Degree = 1;
-                model.C = 1;
-                model.Coef0 = 1;
+                model.SetKernel(SVM.SvmKernelType.Rbf);
+                model.TermCriteria = new MCvTermCriteria(10000000, 0.0000001);
+                //model.Degree = 10;
+                model.C = 3;
+                //model.Coef0 = 1;
                 model.Gamma = 1;
 
                 // Initialize TrainData
                 //Matrix<int> respon = responses[j];
                 TrainData trainData = new TrainData(dataFold, Emgu.CV.ML.MlEnum.DataLayoutType.RowSample, targetFold);
 
-                bool training = model.TrainAuto(trainData, 4);
+                bool training = model.Train(trainData);
+                model.Save(@"E:\Data\Project\TA\Diagnosa kanker payudara dengan SVM dan ekstraksi fitur LESH\core\" + "model" + fold + ".xml");
                 Console.WriteLine(training);
                 int acc = 0;
-                for (int i = 0; i < testingFold.Rows; i++) {
+                for (int i = 0; i < testingFold.Rows; i++)
+                {
                     float hasil = model.Predict(testingFold.GetRow(i));
                     Console.WriteLine(hasil + " " + responseFold.Data[i, 0]);
                     if (hasil == responseFold.Data[i, 0])
                         acc++;
                 }
+                akurasi += ((float)acc / (float)testingFold.Rows) * 100;
                 model.Dispose();
-                Console.WriteLine(((float)acc/(float)testingFold.Rows) * 100);
+                //double c = model.C;
+                //Console.WriteLine(c);
+                Console.WriteLine(((float)acc / (float)testingFold.Rows) * 100);
 
-                int percentComplete = (int)(( (float)(fold + 1) / (float)5 ) * 100);
+                int percentComplete = (int)(((float)(fold + 1) / (float)10) * 100);
 
                 if (percentComplete > highestPercentageReached)
                 {
                     highestPercentageReached = percentComplete;
                     worker.ReportProgress(percentComplete);
                 }
+
             }
+            akurasi /= 10;
+            Console.WriteLine(akurasi);
         }
 
         // Thread evaluate model
