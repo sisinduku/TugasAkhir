@@ -356,7 +356,7 @@ namespace TugasAkhir
             foreach (ArrayList container in roiImage)
             {
                 Matrix<int> im = (Matrix<int>)container[1];
-                Matrix<float> leshFeature = GLCMExtractor.featureGLCM(im);
+                Matrix<float> leshFeature = GLCMExtractor.calc_GLCM(im, 90);
                 Console.WriteLine(i);
                 for (int j = 0; j < leshFeature.Cols; j++)
                 {
@@ -533,10 +533,10 @@ namespace TugasAkhir
                 model.Type = SVM.SvmType.CSvc;
                 model.SetKernel(SVM.SvmKernelType.Rbf);
                 model.TermCriteria = new MCvTermCriteria(10000000, 0.0000001);
-                model.Degree = 3;
-                model.C = 3;
+                //model.Degree = 3;
+                model.C = 2;
                 //model.Coef0 = 1;
-                //model.Gamma = 1;
+                model.Gamma = 1;
 
                 // Initialize TrainData
                 //Matrix<int> respon = responses[j];
