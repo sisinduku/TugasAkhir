@@ -536,15 +536,16 @@ namespace TugasAkhir
                         Console.WriteLine();
                     }
                 }*/
+
                 // Initialize SVM
                 SVM model = new SVM();
                 model.Type = SVM.SvmType.CSvc;
-                model.SetKernel(SVM.SvmKernelType.Linear);
+                model.SetKernel(SVM.SvmKernelType.Rbf);
                 model.TermCriteria = new MCvTermCriteria(10000000, 0.0000001);
                 //model.Degree = 1;
-                model.C = 0.15;
+                model.C = 0.01;
                 //model.Coef0 = 1;
-                //model.Gamma = 1;
+                model.Gamma = 2;
 
                 // Initialize TrainData
                 //Matrix<int> respon = responses[j];
