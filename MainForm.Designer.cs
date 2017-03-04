@@ -286,7 +286,7 @@
             this.metroButton3.Name = "metroButton3";
             this.metroButton3.Size = new System.Drawing.Size(353, 117);
             this.metroButton3.TabIndex = 2;
-            this.metroButton3.Text = "Debug";
+            this.metroButton3.Text = "Pengujian";
             this.metroButton3.UseSelectable = true;
             this.metroButton3.Click += new System.EventHandler(this.metroButton3_Click);
             // 

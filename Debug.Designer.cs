@@ -57,23 +57,23 @@
             this.metroButton3 = new MetroFramework.Controls.MetroButton();
             this.metroProgressBar1 = new MetroFramework.Controls.MetroProgressBar();
             this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
-            this.flowLayoutPanel6 = new System.Windows.Forms.FlowLayoutPanel();
-            this.metroButton9 = new MetroFramework.Controls.MetroButton();
-            this.metroTextBox3 = new MetroFramework.Controls.MetroTextBox();
-            this.metroButton8 = new MetroFramework.Controls.MetroButton();
-            this.metroProgressBar5 = new MetroFramework.Controls.MetroProgressBar();
             this.flowLayoutPanel5 = new System.Windows.Forms.FlowLayoutPanel();
             this.metroButton7 = new MetroFramework.Controls.MetroButton();
             this.metroProgressBar4 = new MetroFramework.Controls.MetroProgressBar();
             this.flowLayoutPanel4 = new System.Windows.Forms.FlowLayoutPanel();
             this.metroButton6 = new MetroFramework.Controls.MetroButton();
             this.metroProgressBar3 = new MetroFramework.Controls.MetroProgressBar();
+            this.tableLayoutPanel7 = new System.Windows.Forms.TableLayoutPanel();
+            this.metroLabel12 = new MetroFramework.Controls.MetroLabel();
+            this.metroTextBox3 = new MetroFramework.Controls.MetroTextBox();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.backgroundWorker2 = new System.ComponentModel.BackgroundWorker();
             this.backgroundWorker3 = new System.ComponentModel.BackgroundWorker();
             this.backgroundWorker4 = new System.ComponentModel.BackgroundWorker();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.textBox2 = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -83,9 +83,9 @@
             this.flowLayoutPanel1.SuspendLayout();
             this.flowLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel6.SuspendLayout();
-            this.flowLayoutPanel6.SuspendLayout();
             this.flowLayoutPanel5.SuspendLayout();
             this.flowLayoutPanel4.SuspendLayout();
+            this.tableLayoutPanel7.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -132,7 +132,7 @@
             this.metroLabel1.Name = "metroLabel1";
             this.metroLabel1.Size = new System.Drawing.Size(332, 93);
             this.metroLabel1.TabIndex = 0;
-            this.metroLabel1.Text = "Instruksi Pelatihan";
+            this.metroLabel1.Text = "Instruksi Pengujian";
             this.metroLabel1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // tableLayoutPanel3
@@ -171,7 +171,7 @@
             this.metroLabel5.Name = "metroLabel5";
             this.metroLabel5.Size = new System.Drawing.Size(295, 75);
             this.metroLabel5.TabIndex = 3;
-            this.metroLabel5.Text = "Load ROI Data Pelatihan";
+            this.metroLabel5.Text = "Load ROI Data ";
             this.metroLabel5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // metroLabel4
@@ -183,8 +183,9 @@
             this.metroLabel4.Name = "metroLabel4";
             this.metroLabel4.Size = new System.Drawing.Size(295, 75);
             this.metroLabel4.TabIndex = 2;
-            this.metroLabel4.Text = "Load Semua Data Pelatihan";
+            this.metroLabel4.Text = "Load Semua Data ";
             this.metroLabel4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.metroLabel4.Click += new System.EventHandler(this.metroLabel4_Click);
             // 
             // metroLabel3
             // 
@@ -253,7 +254,7 @@
             this.metroLabel6.Name = "metroLabel6";
             this.metroLabel6.Size = new System.Drawing.Size(295, 75);
             this.metroLabel6.TabIndex = 8;
-            this.metroLabel6.Text = "Latih Data";
+            this.metroLabel6.Text = "Latih Model dan Uji";
             this.metroLabel6.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // metroLabel11
@@ -457,6 +458,8 @@
             // 
             this.flowLayoutPanel2.Controls.Add(this.metroButton3);
             this.flowLayoutPanel2.Controls.Add(this.metroProgressBar1);
+            this.flowLayoutPanel2.Controls.Add(this.textBox1);
+            this.flowLayoutPanel2.Controls.Add(this.textBox2);
             this.flowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel2.Location = new System.Drawing.Point(1, 59);
             this.flowLayoutPanel2.Margin = new System.Windows.Forms.Padding(0);
@@ -488,9 +491,9 @@
             this.tableLayoutPanel6.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
             this.tableLayoutPanel6.ColumnCount = 1;
             this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel6.Controls.Add(this.flowLayoutPanel6, 0, 2);
             this.tableLayoutPanel6.Controls.Add(this.flowLayoutPanel5, 0, 1);
             this.tableLayoutPanel6.Controls.Add(this.flowLayoutPanel4, 0, 0);
+            this.tableLayoutPanel6.Controls.Add(this.tableLayoutPanel7, 0, 2);
             this.tableLayoutPanel6.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel6.Location = new System.Drawing.Point(23, 247);
             this.tableLayoutPanel6.Name = "tableLayoutPanel6";
@@ -500,76 +503,6 @@
             this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 34F));
             this.tableLayoutPanel6.Size = new System.Drawing.Size(292, 218);
             this.tableLayoutPanel6.TabIndex = 3;
-            // 
-            // flowLayoutPanel6
-            // 
-            this.flowLayoutPanel6.Controls.Add(this.metroButton9);
-            this.flowLayoutPanel6.Controls.Add(this.metroTextBox3);
-            this.flowLayoutPanel6.Controls.Add(this.metroButton8);
-            this.flowLayoutPanel6.Controls.Add(this.metroProgressBar5);
-            this.flowLayoutPanel6.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowLayoutPanel6.Location = new System.Drawing.Point(4, 146);
-            this.flowLayoutPanel6.Name = "flowLayoutPanel6";
-            this.flowLayoutPanel6.Padding = new System.Windows.Forms.Padding(6, 0, 0, 0);
-            this.flowLayoutPanel6.Size = new System.Drawing.Size(284, 68);
-            this.flowLayoutPanel6.TabIndex = 2;
-            // 
-            // metroButton9
-            // 
-            this.metroButton9.Enabled = false;
-            this.metroButton9.Location = new System.Drawing.Point(9, 3);
-            this.metroButton9.Name = "metroButton9";
-            this.metroButton9.Size = new System.Drawing.Size(88, 26);
-            this.metroButton9.TabIndex = 13;
-            this.metroButton9.Text = "Lokasi Simpan";
-            this.metroButton9.UseSelectable = true;
-            // 
-            // metroTextBox3
-            // 
-            // 
-            // 
-            // 
-            this.metroTextBox3.CustomButton.Image = null;
-            this.metroTextBox3.CustomButton.Location = new System.Drawing.Point(136, 1);
-            this.metroTextBox3.CustomButton.Name = "";
-            this.metroTextBox3.CustomButton.Size = new System.Drawing.Size(21, 21);
-            this.metroTextBox3.CustomButton.Style = MetroFramework.MetroColorStyle.Blue;
-            this.metroTextBox3.CustomButton.TabIndex = 1;
-            this.metroTextBox3.CustomButton.Theme = MetroFramework.MetroThemeStyle.Light;
-            this.metroTextBox3.CustomButton.UseSelectable = true;
-            this.metroTextBox3.CustomButton.Visible = false;
-            this.metroTextBox3.Enabled = false;
-            this.metroTextBox3.Lines = new string[0];
-            this.metroTextBox3.Location = new System.Drawing.Point(103, 3);
-            this.metroTextBox3.MaxLength = 32767;
-            this.metroTextBox3.Name = "metroTextBox3";
-            this.metroTextBox3.PasswordChar = '\0';
-            this.metroTextBox3.ScrollBars = System.Windows.Forms.ScrollBars.None;
-            this.metroTextBox3.SelectedText = "";
-            this.metroTextBox3.SelectionLength = 0;
-            this.metroTextBox3.SelectionStart = 0;
-            this.metroTextBox3.Size = new System.Drawing.Size(158, 23);
-            this.metroTextBox3.TabIndex = 14;
-            this.metroTextBox3.UseSelectable = true;
-            this.metroTextBox3.WaterMarkColor = System.Drawing.Color.FromArgb(((int)(((byte)(109)))), ((int)(((byte)(109)))), ((int)(((byte)(109)))));
-            this.metroTextBox3.WaterMarkFont = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Pixel);
-            // 
-            // metroButton8
-            // 
-            this.metroButton8.Enabled = false;
-            this.metroButton8.Location = new System.Drawing.Point(9, 35);
-            this.metroButton8.Name = "metroButton8";
-            this.metroButton8.Size = new System.Drawing.Size(88, 26);
-            this.metroButton8.TabIndex = 4;
-            this.metroButton8.Text = "Simpan Model";
-            this.metroButton8.UseSelectable = true;
-            // 
-            // metroProgressBar5
-            // 
-            this.metroProgressBar5.Location = new System.Drawing.Point(103, 35);
-            this.metroProgressBar5.Name = "metroProgressBar5";
-            this.metroProgressBar5.Size = new System.Drawing.Size(157, 23);
-            this.metroProgressBar5.TabIndex = 10;
             // 
             // flowLayoutPanel5
             // 
@@ -629,6 +562,61 @@
             this.metroProgressBar3.Size = new System.Drawing.Size(157, 23);
             this.metroProgressBar3.TabIndex = 10;
             // 
+            // tableLayoutPanel7
+            // 
+            this.tableLayoutPanel7.ColumnCount = 1;
+            this.tableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel7.Controls.Add(this.metroLabel12, 0, 0);
+            this.tableLayoutPanel7.Controls.Add(this.metroTextBox3, 0, 1);
+            this.tableLayoutPanel7.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel7.Location = new System.Drawing.Point(4, 146);
+            this.tableLayoutPanel7.Name = "tableLayoutPanel7";
+            this.tableLayoutPanel7.RowCount = 2;
+            this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 30F));
+            this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 70F));
+            this.tableLayoutPanel7.Size = new System.Drawing.Size(284, 68);
+            this.tableLayoutPanel7.TabIndex = 2;
+            // 
+            // metroLabel12
+            // 
+            this.metroLabel12.AutoSize = true;
+            this.metroLabel12.Location = new System.Drawing.Point(3, 0);
+            this.metroLabel12.Name = "metroLabel12";
+            this.metroLabel12.Size = new System.Drawing.Size(36, 19);
+            this.metroLabel12.TabIndex = 0;
+            this.metroLabel12.Text = "Hasil";
+            // 
+            // metroTextBox3
+            // 
+            // 
+            // 
+            // 
+            this.metroTextBox3.CustomButton.Image = null;
+            this.metroTextBox3.CustomButton.Location = new System.Drawing.Point(238, 2);
+            this.metroTextBox3.CustomButton.Name = "";
+            this.metroTextBox3.CustomButton.Size = new System.Drawing.Size(37, 37);
+            this.metroTextBox3.CustomButton.Style = MetroFramework.MetroColorStyle.Blue;
+            this.metroTextBox3.CustomButton.TabIndex = 1;
+            this.metroTextBox3.CustomButton.Theme = MetroFramework.MetroThemeStyle.Light;
+            this.metroTextBox3.CustomButton.UseSelectable = true;
+            this.metroTextBox3.CustomButton.Visible = false;
+            this.metroTextBox3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.metroTextBox3.Lines = new string[0];
+            this.metroTextBox3.Location = new System.Drawing.Point(3, 23);
+            this.metroTextBox3.MaxLength = 32767;
+            this.metroTextBox3.Multiline = true;
+            this.metroTextBox3.Name = "metroTextBox3";
+            this.metroTextBox3.PasswordChar = '\0';
+            this.metroTextBox3.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.metroTextBox3.SelectedText = "";
+            this.metroTextBox3.SelectionLength = 0;
+            this.metroTextBox3.SelectionStart = 0;
+            this.metroTextBox3.Size = new System.Drawing.Size(278, 42);
+            this.metroTextBox3.TabIndex = 1;
+            this.metroTextBox3.UseSelectable = true;
+            this.metroTextBox3.WaterMarkColor = System.Drawing.Color.FromArgb(((int)(((byte)(109)))), ((int)(((byte)(109)))), ((int)(((byte)(109)))));
+            this.metroTextBox3.WaterMarkFont = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Pixel);
+            // 
             // backgroundWorker1
             // 
             this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
@@ -657,6 +645,20 @@
             this.backgroundWorker4.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker4_ProgressChanged);
             this.backgroundWorker4.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker4_RunWorkerCompleted);
             // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(13, 32);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(100, 20);
+            this.textBox1.TabIndex = 2;
+            // 
+            // textBox2
+            // 
+            this.textBox2.Location = new System.Drawing.Point(119, 32);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(100, 20);
+            this.textBox2.TabIndex = 3;
+            // 
             // Debug
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -664,7 +666,7 @@
             this.ClientSize = new System.Drawing.Size(738, 568);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "Debug";
-            this.Text = "Debug Form";
+            this.Text = "Pengujian";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Debug_FormClosed);
             this.Load += new System.EventHandler(this.Debug_Load);
             this.tableLayoutPanel1.ResumeLayout(false);
@@ -678,10 +680,12 @@
             this.flowLayoutPanel3.ResumeLayout(false);
             this.flowLayoutPanel1.ResumeLayout(false);
             this.flowLayoutPanel2.ResumeLayout(false);
+            this.flowLayoutPanel2.PerformLayout();
             this.tableLayoutPanel6.ResumeLayout(false);
-            this.flowLayoutPanel6.ResumeLayout(false);
             this.flowLayoutPanel5.ResumeLayout(false);
             this.flowLayoutPanel4.ResumeLayout(false);
+            this.tableLayoutPanel7.ResumeLayout(false);
+            this.tableLayoutPanel7.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -717,11 +721,6 @@
         private MetroFramework.Controls.MetroButton metroButton3;
         private MetroFramework.Controls.MetroProgressBar metroProgressBar1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel6;
-        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel6;
-        private MetroFramework.Controls.MetroButton metroButton9;
-        private MetroFramework.Controls.MetroTextBox metroTextBox3;
-        private MetroFramework.Controls.MetroButton metroButton8;
-        private MetroFramework.Controls.MetroProgressBar metroProgressBar5;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel5;
         private MetroFramework.Controls.MetroButton metroButton7;
         private MetroFramework.Controls.MetroProgressBar metroProgressBar4;
@@ -734,5 +733,10 @@
         private System.ComponentModel.BackgroundWorker backgroundWorker2;
         private System.ComponentModel.BackgroundWorker backgroundWorker3;
         private System.ComponentModel.BackgroundWorker backgroundWorker4;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel7;
+        private MetroFramework.Controls.MetroLabel metroLabel12;
+        private MetroFramework.Controls.MetroTextBox metroTextBox3;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox textBox2;
     }
 }

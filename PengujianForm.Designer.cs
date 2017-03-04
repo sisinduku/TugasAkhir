@@ -76,6 +76,9 @@
             this.backgroundWorker3 = new System.ComponentModel.BackgroundWorker();
             this.backgroundWorker4 = new System.ComponentModel.BackgroundWorker();
             this.backgroundWorker5 = new System.ComponentModel.BackgroundWorker();
+            this.tableLayoutPanel7 = new System.Windows.Forms.TableLayoutPanel();
+            this.metroLabel12 = new MetroFramework.Controls.MetroLabel();
+            this.metroTextBox4 = new MetroFramework.Controls.MetroTextBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel5.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
@@ -89,6 +92,7 @@
             this.tableLayoutPanel3.SuspendLayout();
             this.flowLayoutPanel6.SuspendLayout();
             this.flowLayoutPanel7.SuspendLayout();
+            this.tableLayoutPanel7.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -329,6 +333,7 @@
             this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel6.Controls.Add(this.flowLayoutPanel5, 0, 1);
             this.tableLayoutPanel6.Controls.Add(this.flowLayoutPanel4, 0, 0);
+            this.tableLayoutPanel6.Controls.Add(this.tableLayoutPanel7, 0, 2);
             this.tableLayoutPanel6.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel6.Location = new System.Drawing.Point(23, 266);
             this.tableLayoutPanel6.Name = "tableLayoutPanel6";
@@ -673,6 +678,61 @@
             this.backgroundWorker5.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker5_ProgressChanged);
             this.backgroundWorker5.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker5_RunWorkerCompleted);
             // 
+            // tableLayoutPanel7
+            // 
+            this.tableLayoutPanel7.ColumnCount = 1;
+            this.tableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel7.Controls.Add(this.metroLabel12, 0, 0);
+            this.tableLayoutPanel7.Controls.Add(this.metroTextBox4, 0, 1);
+            this.tableLayoutPanel7.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel7.Location = new System.Drawing.Point(4, 146);
+            this.tableLayoutPanel7.Name = "tableLayoutPanel7";
+            this.tableLayoutPanel7.RowCount = 2;
+            this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 75F));
+            this.tableLayoutPanel7.Size = new System.Drawing.Size(290, 88);
+            this.tableLayoutPanel7.TabIndex = 2;
+            // 
+            // metroLabel12
+            // 
+            this.metroLabel12.AutoSize = true;
+            this.metroLabel12.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.metroLabel12.Location = new System.Drawing.Point(3, 0);
+            this.metroLabel12.Name = "metroLabel12";
+            this.metroLabel12.Size = new System.Drawing.Size(284, 22);
+            this.metroLabel12.TabIndex = 0;
+            this.metroLabel12.Text = "Hasil";
+            // 
+            // metroTextBox4
+            // 
+            // 
+            // 
+            // 
+            this.metroTextBox4.CustomButton.Image = null;
+            this.metroTextBox4.CustomButton.Location = new System.Drawing.Point(226, 2);
+            this.metroTextBox4.CustomButton.Name = "";
+            this.metroTextBox4.CustomButton.Size = new System.Drawing.Size(55, 55);
+            this.metroTextBox4.CustomButton.Style = MetroFramework.MetroColorStyle.Blue;
+            this.metroTextBox4.CustomButton.TabIndex = 1;
+            this.metroTextBox4.CustomButton.Theme = MetroFramework.MetroThemeStyle.Light;
+            this.metroTextBox4.CustomButton.UseSelectable = true;
+            this.metroTextBox4.CustomButton.Visible = false;
+            this.metroTextBox4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.metroTextBox4.Lines = new string[0];
+            this.metroTextBox4.Location = new System.Drawing.Point(3, 25);
+            this.metroTextBox4.MaxLength = 32767;
+            this.metroTextBox4.Name = "metroTextBox4";
+            this.metroTextBox4.PasswordChar = '\0';
+            this.metroTextBox4.ScrollBars = System.Windows.Forms.ScrollBars.None;
+            this.metroTextBox4.SelectedText = "";
+            this.metroTextBox4.SelectionLength = 0;
+            this.metroTextBox4.SelectionStart = 0;
+            this.metroTextBox4.Size = new System.Drawing.Size(284, 60);
+            this.metroTextBox4.TabIndex = 1;
+            this.metroTextBox4.UseSelectable = true;
+            this.metroTextBox4.WaterMarkColor = System.Drawing.Color.FromArgb(((int)(((byte)(109)))), ((int)(((byte)(109)))), ((int)(((byte)(109)))));
+            this.metroTextBox4.WaterMarkFont = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Pixel);
+            // 
             // PengujianForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -680,7 +740,7 @@
             this.ClientSize = new System.Drawing.Size(727, 587);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "PengujianForm";
-            this.Text = "Pengujian";
+            this.Text = "Klasifikasi";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.PengujianForm_FormClosed);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel5.ResumeLayout(false);
@@ -698,6 +758,8 @@
             this.tableLayoutPanel3.PerformLayout();
             this.flowLayoutPanel6.ResumeLayout(false);
             this.flowLayoutPanel7.ResumeLayout(false);
+            this.tableLayoutPanel7.ResumeLayout(false);
+            this.tableLayoutPanel7.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -752,5 +814,8 @@
         private System.ComponentModel.BackgroundWorker backgroundWorker3;
         private System.ComponentModel.BackgroundWorker backgroundWorker4;
         private System.ComponentModel.BackgroundWorker backgroundWorker5;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel7;
+        private MetroFramework.Controls.MetroLabel metroLabel12;
+        private MetroFramework.Controls.MetroTextBox metroTextBox4;
     }
 }

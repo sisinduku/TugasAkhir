@@ -356,11 +356,11 @@ namespace TugasAkhir
             foreach (ArrayList container in roiImage)
             {
                 Matrix<int> im = (Matrix<int>)container[1];
-                Matrix<float> leshFeature = GLCMExtractor.calc_GLCM(im, 90);
-                Console.WriteLine(i);
+                Matrix<float> leshFeature = GLCMExtractor.featureGLCM(im);
+                Console.WriteLine(container[0].ToString());
                 for (int j = 0; j < leshFeature.Cols; j++)
                 {
-                    Console.WriteLine("[" + 0 + ", " + j + "] = " + leshFeature.Data[0, j]);
+                    Console.WriteLine(leshFeature.Data[0, j].ToString("G9"));
                 }
                 GLCMFeatures.Add(leshFeature);
 
@@ -374,6 +374,8 @@ namespace TugasAkhir
                 i++;
             }
 
+            //DBConnect database = new DBConnect();
+            //database.Insert(GLCMFeatures);
             return GLCMFeatures;
         }
 
@@ -432,7 +434,7 @@ namespace TugasAkhir
         }
 
         // Fungsi untuk melatih SVM
-        void evaluateSVM(List<Matrix<float>> samples, List<string> classes, BackgroundWorker worker, DoWorkEventArgs e)
+        string evaluateSVM(List<Matrix<float>> samples, List<string> classes, BackgroundWorker worker, DoWorkEventArgs e)
         {
             int highestPercentageReached = 0;
             // Initialize Sample
@@ -477,6 +479,7 @@ namespace TugasAkhir
                 count++;
             }
             float akurasi = 0;
+            string result = "";
             for (int fold = 0; fold < 10; fold++)
             {
                 // Data latih dan testing
@@ -534,9 +537,9 @@ namespace TugasAkhir
                 model.SetKernel(SVM.SvmKernelType.Rbf);
                 model.TermCriteria = new MCvTermCriteria(10000000, 0.0000001);
                 //model.Degree = 3;
-                model.C = 2;
+                model.C = Convert.ToDouble(textBox2.Text);
                 //model.Coef0 = 1;
-                model.Gamma = 1;
+                model.Gamma = Convert.ToDouble(textBox1.Text);
 
                 // Initialize TrainData
                 //Matrix<int> respon = responses[j];
@@ -549,7 +552,7 @@ namespace TugasAkhir
                 for (int i = 0; i < testingFold.Rows; i++)
                 {
                     float hasil = model.Predict(testingFold.GetRow(i));
-                    Console.WriteLine(hasil + " " + responseFold.Data[i, 0]);
+                    //Console.WriteLine(hasil + " " + responseFold.Data[i, 0]);
                     if (hasil == responseFold.Data[i, 0])
                         acc++;
                 }
@@ -558,7 +561,7 @@ namespace TugasAkhir
                 //double c = model.C;
                 //Console.WriteLine(c);
                 Console.WriteLine(((float)acc / (float)testingFold.Rows) * 100);
-
+                result += (((float)acc / (float)testingFold.Rows) * 100).ToString() + Environment.NewLine;
                 int percentComplete = (int)(((float)(fold + 1) / (float)10) * 100);
 
                 if (percentComplete > highestPercentageReached)
@@ -570,13 +573,16 @@ namespace TugasAkhir
             }
             akurasi /= 10;
             Console.WriteLine(akurasi);
+            result += akurasi.ToString() + Environment.NewLine;
+            Console.WriteLine(result);
+            return result;
         }
 
         // Thread evaluate model
         private void backgroundWorker4_DoWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
-            evaluateSVM(featureList, classes, worker, e);
+            e.Result = evaluateSVM(featureList, classes, worker, e);
         }
 
         // Progress bar evaluasi SVM
@@ -608,7 +614,14 @@ namespace TugasAkhir
                 // Finally, handle the case where the operation 
                 // succeeded.
                 this.metroButton7.Enabled = true;
+                this.metroTextBox3.Text = e.Result as string;
+                Console.WriteLine((string)e.Result);
             }
+        }
+
+        private void metroLabel4_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

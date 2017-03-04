@@ -26,25 +26,22 @@ namespace TugasAkhir
             PhaseCong2 test = new PhaseCong2();
             LESH lesh = new LESH();
             GLCM glcm = new GLCM();
-            Image<Gray, byte> image = new Image<Gray, byte>(@"E:\Data\Project\TA\Diagnosa kanker payudara dengan SVM dan ekstraksi fitur LESH\core\all-mias\mdb132.pgm");
+            Image<Gray, byte> image = new Image<Gray, byte>(@"E:\Data\Project\TA\Diagnosa kanker payudara dengan SVM dan ekstraksi fitur LESH\core\all-mias\mdb028.pgm");
             Image<Gray, byte> CLAHEImage = image.Copy();
             //Image<Gray, double> newIm = image.Convert<Gray, double>().Copy();
             //CvInvoke.Normalize(newIm.Copy(), newIm, 1, 0);
             //newIm.Convert<Gray, byte>().CopyTo(image);
-            //CLAHEImage = Preprocessing.enhanceImage(image);
+            CLAHEImage = Preprocessing.enhanceImage(image);
             //CvInvoke.CLAHE(image, 3.56, new Size(8, 8), CLAHEImage);
-            int radius = 18 * 2;
+            int radius = 56 * 2;
             float jejari = radius / 2;
-            int x = Convert.ToInt32(335 - jejari);
-            int y = Convert.ToInt32(1024 - 766 - jejari);
+            int x = Convert.ToInt32(338 - jejari);
+            int y = Convert.ToInt32(1024 - 314 - jejari);
             //imageBox1.Image = CLAHEImage;
             imageBox1.Image = CLAHEImage.Copy(new Rectangle(x, y, radius, radius));
             //Matrix<double> img = new Matrix<double>(radius, radius);
             //image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>().CopyTo(img);
-            List<Matrix<double>> PC = new List<Matrix<double>>();
-            PhaseCong2 phaseCongruency = new PhaseCong2();
-            //phaseCongruency.calcPhaseCong2(image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>(), PC, new Matrix<double>(radius / 2, radius / 2));
-            //Matrix<double> localEnergy = new Matrix<double>(PC[0].Rows, PC[0].Cols);
+            
             //Matrix<float> feature = glcm.calc_GLCM(image.Copy(new Rectangle(x, y, radius/2, radius/2)).Convert<Gray, double>(), 0);
             /*for (int i = 0; i < PC.Count; i++)
             {

@@ -254,7 +254,7 @@
             this.metroLabel6.Name = "metroLabel6";
             this.metroLabel6.Size = new System.Drawing.Size(286, 69);
             this.metroLabel6.TabIndex = 8;
-            this.metroLabel6.Text = "Latih Data";
+            this.metroLabel6.Text = "Latih Model";
             this.metroLabel6.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // metroLabel11

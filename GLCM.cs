@@ -83,7 +83,7 @@ namespace TugasAkhir
                     homogenity += (gl.Data[i, j] / (1 + Math.Abs(i - j)));
                     IDM += (gl.Data[i, j] / (1 + (i - j) * (i - j)));
                     if (gl.Data[i, j] != 0)
-                        entropy += -(gl.Data[i, j] * (float)Math.Log10(Convert.ToDouble(gl.Data[i, j]) + epsilon));
+                        entropy += -(gl.Data[i, j] * Convert.ToSingle(Math.Log10(Convert.ToDouble(gl.Data[i, j]) + epsilon)));
                     //mean1 = mean1 + 0.5f * (i * gl.Data[i, j] + j * gl.Data[i, j]);
                     pxplusy[i + j] += gl.Data[i, j];
                     pxminy[Math.Abs(i - j)] += gl.Data[i, j];
@@ -102,8 +102,8 @@ namespace TugasAkhir
                     py[i] += gl.Data[j, i];
                 }
                 variance += rowVal;
-            }            
-
+            }
+            variance = Convert.ToSingle(Math.Sqrt(variance));
             for (int i = 0; i < gl.Rows * 2 - 2; i++)
             {
                 sumAverage += i * pxplusy[i];
@@ -127,12 +127,14 @@ namespace TugasAkhir
                 {
                     hxy1 += -(gl.Data[i, j] * (float)Math.Log10(px[i] * py[j] + epsilon));
                     hxy2 += -(px[i] * py[j] * (float)Math.Log10(px[i] * py[j] + epsilon));
-                    rowVal += gl.Data[i, j] * ((i - mean) * (j - mean) / (float)Math.Sqrt(variance * variance));
+                    //rowVal += gl.Data[i, j] * ((i - mean) * (j - mean) / (float)Math.Sqrt(variance * variance));
+                    rowVal += ((i * j) * gl.Data[i, j] - (mean * mean)) / (variance * variance);
                 }
                 hx += -(px[i] * (float)Math.Log10(px[i] + epsilon));
                 hy += -(py[i] * (float)Math.Log10(py[i] + epsilon));
                 correlation += rowVal;
             }
+            
             float imc1 = (hxy - hxy1) / (Math.Max(hx, hy));
             float imc2 = (float)Math.Sqrt(1 - (float)Math.Exp(-2 * (hxy2 - hxy)));
 

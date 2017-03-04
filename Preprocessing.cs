@@ -18,11 +18,10 @@ namespace TugasAkhir
             CvInvoke.MedianBlur(src, result, 3);
 
             // Unsharp mask filter
-            Image<Gray, byte> temp1 = result.Clone();
             Image<Gray, byte> smoothed = result.Clone();
             Image<Gray, byte> input = result.Clone();
-            CvInvoke.GaussianBlur(result.Clone(), temp1, new Size(0, 0), 2);
-            CvInvoke.GaussianBlur(temp1.Clone(), smoothed, new Size(0, 0), 2);
+            CvInvoke.GaussianBlur(result.Clone(), smoothed, new Size(0, 0), 2);
+            //CvInvoke.GaussianBlur(temp1.Clone(), smoothed, new Size(0, 0), 2);
             CvInvoke.AddWeighted(input, 1.5, smoothed, -0.5, 0, result);
 
             // CLAHE
@@ -34,8 +33,8 @@ namespace TugasAkhir
             /*CvInvoke.FastNlMeansDenoising(result.Clone(), result, 3, 7, 21);
             */
             Mat kernel = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Rectangle, new Size(3, 3), new Point(-1, -1)); 
-            MCvScalar bor = new MCvScalar();
-            CvInvoke.MorphologyEx(result.Clone(), result, Emgu.CV.CvEnum.MorphOp.Close, kernel, new Point(-1, -1), 1, Emgu.CV.CvEnum.BorderType.Reflect101, bor);
+            //MCvScalar bor = new MCvScalar();*/
+            //CvInvoke.MorphologyEx(result.Clone(), result, Emgu.CV.CvEnum.MorphOp.Close, kernel, new Point(-1, -1), 1, Emgu.CV.CvEnum.BorderType.Reflect101, bor);
             return result;
         }
     }
