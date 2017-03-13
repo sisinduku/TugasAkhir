@@ -19,7 +19,7 @@ namespace TugasAkhir
     {
         private Hashtable listImage;
         private ArrayList roiImage = new ArrayList();
-        List<Matrix<double>> feature = new List<Matrix<double>>();
+        List<Matrix<float>> feature = new List<Matrix<float>>();
         List<string> classes = new List<string>();
         SVM modelSVM = new SVM();
 
@@ -77,6 +77,7 @@ namespace TugasAkhir
                 {
                     Image<Gray, byte> My_Image = new Image<Gray, byte>(@paths[i - 1]);
                     Image<Gray, byte> CLAHEImage = My_Image;
+
                     CLAHEImage = Preprocessing.enhanceImage(My_Image);
                     String fullFileName = paths[i - 1].Split('\\', '/').Last();
                     String fileName = fullFileName.Split('.').First();
@@ -246,6 +247,7 @@ namespace TugasAkhir
             string line;
             string[] elements;
             ArrayList result = new ArrayList();
+            //int totalImageCount = 119;
             int totalImageCount = File.ReadLines(paths).Count();
             int i = 1;
             int highestPercentageReached = 0;
@@ -270,23 +272,26 @@ namespace TugasAkhir
                         Console.WriteLine(elements[0]);
                         Image<Gray, byte> My_Image = (Image<Gray, byte>)listImage[elements[0]];
                         int radius = 0;
-                        if ((Int32.Parse(elements[6]) * 2) % 4 == 0) {
+                        if ((Int32.Parse(elements[6]) * 2) % 4 == 0)
+                        {
                             radius = Int32.Parse(elements[6]) * 2;
                         }
-                        else {
+                        else
+                        {
                             radius = (Int32.Parse(elements[6]) * 2) + (4 - ((Int32.Parse(elements[6]) * 2) % 4));
                         }
                         float jejari = radius / 2;
                         int x = Convert.ToInt32(Int32.Parse(elements[4]) - jejari);
                         int y = Convert.ToInt32(1024 - Int32.Parse(elements[5]) - jejari);
-
-                        Image<Gray, double> newImage = My_Image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>();
-
-                        container.Add(elements[0]);                 // File name
-                        container.Add(newImage);                    // Image
-                        container.Add(elements[2]);                 // Calsification
+                        Matrix<double> localEnergy = new Matrix<double>(radius, radius);
+                        Image<Gray, int> im = My_Image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, int>();
+                        Matrix<int> newImage = new Matrix<int>(radius, radius);
+                        im.CopyTo(newImage);
+                        container.Add(elements[0]);                                // File name
+                        container.Add(newImage);                                    // Image
+                        container.Add(elements[3]);                                // Calsification
                         result.Add(container);
-
+                        localEnergy.Dispose();
                         int percentComplete = (int)((float)i / (float)totalImageCount * 100);
 
                         if (percentComplete > highestPercentageReached)
@@ -361,15 +366,19 @@ namespace TugasAkhir
             int totalImageCount = roiImage.Count;
             int i = 1;
             int highestPercentageReached = 0;
-            List<Matrix<float>> leshFeatures = new List<Matrix<float>>();
+            List<Matrix<float>> GLCMFeatures = new List<Matrix<float>>();
 
-            LESH leshExtractor = new LESH();
+            GLCM GLCMExtractor = new GLCM();
             foreach (ArrayList container in roiImage)
             {
-                Console.WriteLine((string)container[0]);
-                Image<Gray, double> im = (Image<Gray, double>)container[1];
-                Matrix<float> leshFeature = leshExtractor.calc_LESH(im);
-                leshFeatures.Add(leshFeature);
+                Matrix<int> im = (Matrix<int>)container[1];
+                Matrix<float> leshFeature = GLCMExtractor.featureGLCM(im);
+                Console.WriteLine(container[0].ToString());
+                for (int j = 0; j < leshFeature.Cols; j++)
+                {
+                    Console.WriteLine(leshFeature.Data[0, j].ToString("G9"));
+                }
+                GLCMFeatures.Add(leshFeature);
 
                 int percentComplete = (int)((float)i / (float)totalImageCount * 100);
 
@@ -381,7 +390,7 @@ namespace TugasAkhir
                 i++;
             }
 
-            return leshFeatures;
+            return GLCMFeatures;
         }
 
         // Thread untuk ekstraksi fitur
@@ -419,7 +428,7 @@ namespace TugasAkhir
             {
                 // Finally, handle the case where the operation 
                 // succeeded.
-                feature = (List<Matrix<double>>)e.Result;                
+                feature = (List<Matrix<float>>)e.Result;                
                 metroButton7.Enabled = true;
             }
         }
@@ -434,46 +443,65 @@ namespace TugasAkhir
         }
 
         // Fungsi untuk klasifikasi
-        string klasifikasi(List<Matrix<double>> feature, BackgroundWorker worker, DoWorkEventArgs e) {
+        string klasifikasi(List<Matrix<float>> samples, BackgroundWorker worker, DoWorkEventArgs e) {
             worker.ReportProgress(0);
-            string result = "";
-            Matrix<float> fitur = new Matrix<float>(feature.Count, feature[0].Cols);
+            DBConnect database = new DBConnect();
+            Matrix<float> dataPelatihan = database.Select();
+
+            // Initialize Sample
+            Matrix<float> data = new Matrix<float>(samples.Count, samples[0].Cols);
             int count = 0;
-            foreach (Matrix<double> elemen in feature) {
-                for (int cols = 0; cols < elemen.Cols; cols++)
+            foreach (Matrix<float> sample in samples)
+            {
+                for (int cols = 0; cols < sample.Cols; cols++)
                 {
-                    fitur.Data[count, cols] = Convert.ToSingle(elemen.Data[0, cols]);
+                    data.Data[count, cols] = sample.Data[0, cols];
                 }
                 count++;
             }
-            Console.WriteLine(modelSVM.C);
-            for (int i = 0; i < fitur.Rows; i++) {
-                float hasil = modelSVM.Predict(fitur.GetRow(i));
+
+            for (int i = 0; i < data.Cols; i++)
+            {
+                Matrix<float> dimention = data.GetCol(i);
+                MCvScalar mean = new MCvScalar();
+                MCvScalar std = new MCvScalar();
+                CvInvoke.MeanStdDev(dimention, ref mean, ref std);
+                dimention = (dimention - mean.V0) / std.V0;
+                for (int j = 0; j < data.Rows; j++)
+                {
+                    data.Data[j, i] = dimention.Data[j, 0];
+                }
+            }
+
+            string result = "";
+            for (int i = 0; i < data.Rows; i++) {
+                float hasil = modelSVM.Predict(data.GetRow(i));
                 int target = -1;
                 string kelas = classes[i];
                 switch (kelas)
                 {
-                    case "CALC":
-                        target = 0;
-                        break;
-                    case "CIRC":
+                    case "M":
                         target = 1;
                         break;
-                    case "SPIC":
-                        target = 2;
-                        break;
-                    case "MISC":
-                        target = 3;
-                        break;
-                    case "ARCH":
-                        target = 4;
-                        break;
-                    case "ASYM":
-                        target = 5;
+                    case "B":
+                        target = 0;
                         break;
                 }
+                string stringHasil = "";
+                switch (Convert.ToInt32(hasil))
+                {
+                    case 1:
+                        stringHasil = "Ganas";
+                        break;
+                    case 0:
+                        stringHasil = "Jinak";
+                        break;
+                }
+                count++;
+                ArrayList container = (ArrayList)roiImage[i];
+                result += container[0].ToString() + " = " + stringHasil + Environment.NewLine;
                 Console.WriteLine(target + " " + hasil);
-                worker.ReportProgress((int)((float)i / (float)(fitur.Rows - 1) * 100));
+                worker.ReportProgress((int)((float)i / (float)(data.Rows - 1) * 100));
             }
             return result;
         }
@@ -511,7 +539,7 @@ namespace TugasAkhir
                 // Finally, handle the case where the operation 
                 // succeeded.
                 string hasil = (string)e.Result;
-                Console.WriteLine(hasil);
+                metroTextBox4.Text = hasil;
             }
         }
     }

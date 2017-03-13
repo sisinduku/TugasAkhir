@@ -108,8 +108,8 @@ namespace TugasAkhir
                 for (int i = 0; i < GLCMFeatures.Count; i++)
                 {
                     Matrix<float> fitur = (Matrix<float>)GLCMFeatures[i];
-                    Rows.Add(string.Format("('{0}','{1}','{2}','{3}','{4}')", MySqlHelper.EscapeString(fitur.Data[0, 0].ToString("G9")), MySqlHelper.EscapeString(fitur.Data[0, 1].ToString("G9")), MySqlHelper.EscapeString(fitur.Data[0, 2].ToString("G9")),
-                        MySqlHelper.EscapeString(fitur.Data[0, 3].ToString("G9")), MySqlHelper.EscapeString(fitur.Data[0, 4].ToString("G9"))));
+                    Rows.Add(string.Format("('{0}','{1}','{2}','{3}','{4}')", Convert.ToDouble(fitur.Data[0, 0]), Convert.ToDouble(fitur.Data[0, 1]), Convert.ToDouble(fitur.Data[0, 2]),
+                        Convert.ToDouble(fitur.Data[0, 3]), Convert.ToDouble(fitur.Data[0, 4])));
                 }
                 sCommand.Append(string.Join(",", Rows));
                 sCommand.Append(";");
@@ -128,45 +128,68 @@ namespace TugasAkhir
         }
 
         //Select statement
-        public List<Matrix<float>> Select()
+        public Matrix<float> Select()
         {
             string query = "SELECT * FROM tbl_fitur";
 
             //Create a list to store the result
             List<Matrix<float>> result = new List<Matrix<float>>();
-            
+            Matrix<float> coba = new Matrix<float>(1, 5);
+            int count = 1;
+
             //Open connection
             if (this.OpenConnection() == true)
             {
                 //Create Command
                 MySqlCommand cmd = new MySqlCommand(query, connection);
                 //Create a data reader and Execute the command
-                MySqlDataReader dataReader = cmd.ExecuteReader();
-
-                //Read the data and store them in the list
-                while (dataReader.Read())
-                {
-                    Matrix<float> elemen = new Matrix<float>(1, 5);
-                    elemen.Data[0, 0] = Single.Parse(dataReader["fitur_asm"].ToString());
-                    elemen.Data[0, 1] = Single.Parse(dataReader["fitur_contrast"].ToString());
-                    elemen.Data[0, 2] = Single.Parse(dataReader["fitur_correlation"].ToString());
-                    elemen.Data[0, 3] = Single.Parse(dataReader["fitur_idm"].ToString());
-                    elemen.Data[0, 4] = Single.Parse(dataReader["fitur_entropy"].ToString());
-                    result.Add(elemen);
+                using (MySqlDataReader dataReader = cmd.ExecuteReader()) {
+                    //Read the data and store them in the list
+                    while (dataReader.Read())
+                    {
+                        //Console.WriteLine(count);
+                        Matrix<float> elemen = new Matrix<float>(1, 5);
+                        elemen.Data[0, 0] = (float)dataReader.GetDouble(1);
+                        elemen.Data[0, 1] = (float)dataReader.GetDouble(2);
+                        elemen.Data[0, 2] = (float)dataReader.GetDouble(3);
+                        elemen.Data[0, 3] = (float)dataReader.GetDouble(4);
+                        elemen.Data[0, 4] = (float)dataReader.GetDouble(5);
+                        result.Add(elemen.Clone());
+                        
+                        //Console.WriteLine(coba.Data[count, 0] + " " + coba.Data[count, 1] + " " + coba.Data[count, 2] + " " + coba.Data[count, 3] + " " + coba.Data[count, 4]);
+                        //count++;
+                    }
+                    //close Data Reader
+                    dataReader.Close();
                 }
+                
 
-                //close Data Reader
-                dataReader.Close();
+                Matrix<float> hasil = new Matrix<float>(1, 5);
+                Console.WriteLine(result.Count);
+                foreach (Matrix<float> row in result)
+                {
+                    hasil = hasil.ConcateVertical(row).Clone();
+                }
+                hasil = hasil.RemoveRows(0, 1).Clone();
 
+                for (int i = 0; i < hasil.Rows; i++)
+                {
+                    Console.WriteLine(i+1);
+                    for (int j = 0; j < hasil.Cols; j++)
+                    {
+                        Console.WriteLine(hasil.Data[i, j].ToString("G9"));
+                    }
+                }
                 //close Connection
                 this.CloseConnection();
 
                 //return list to be displayed
-                return result;
+                return hasil;
             }
             else
             {
-                return result;
+                Console.WriteLine("asdasdasd");
+                return null;
             }
         }
         /*

@@ -56,15 +56,18 @@ namespace TugasAkhir
             Hashtable listImage = new Hashtable();
             int highestPercentageReached = 0;
 
-            for (int i = 1; i <= totalImageCount; i++) {
+            for (int i = 1; i <= totalImageCount; i++)
+            {
                 if (worker.CancellationPending)
                 {
                     e.Cancel = true;
                     break;
                 }
-                else {
+                else
+                {
                     Image<Gray, byte> My_Image = new Image<Gray, byte>(@paths[i - 1]);
                     Image<Gray, byte> CLAHEImage = My_Image;
+
                     CLAHEImage = Preprocessing.enhanceImage(My_Image);
                     String fullFileName = paths[i - 1].Split('\\', '/').Last();
                     String fileName = fullFileName.Split('.').First();
@@ -111,10 +114,12 @@ namespace TugasAkhir
                 // Finally, handle the case where the operation 
                 // succeeded.
                 listImage = (Hashtable)e.Result;
-                foreach (DictionaryEntry elemen in listImage) {
+                foreach (DictionaryEntry elemen in listImage)
+                {
                     Console.WriteLine(elemen.Key);
                 }
                 Console.WriteLine(listImage.Count);
+                metroButton2.Enabled = true;
             }
 
             // Enable the Start button.
@@ -184,6 +189,8 @@ namespace TugasAkhir
             backgroundWorker2.WorkerSupportsCancellation = true;
             backgroundWorker2.WorkerReportsProgress = true;
             backgroundWorker2.RunWorkerAsync();
+
+            this.metroButton5.Enabled = false;
         }
 
         // Thread get ROI from images
@@ -213,33 +220,39 @@ namespace TugasAkhir
             {
                 Hashtable image = new Hashtable();
                 ArrayList container = new ArrayList();
-                if (worker.CancellationPending) {
+                if (worker.CancellationPending)
+                {
                     e.Cancel = true;
                     break;
                 }
-                else {
+                else
+                {
                     elements = line.Split(' ');
-                    if (!elements[2].Equals("NORM") && !elements[4].Equals("*NOTE3*")) {
+                    if (!elements[2].Equals("NORM") && !elements[4].Equals("*NOTE3*"))
+                    {
                         Console.WriteLine(elements[0]);
                         Image<Gray, byte> My_Image = (Image<Gray, byte>)listImage[elements[0]];
                         int radius = 0;
-                        if ((Int32.Parse(elements[6]) * 2) % 4 == 0) {
+                        if ((Int32.Parse(elements[6]) * 2) % 4 == 0)
+                        {
                             radius = Int32.Parse(elements[6]) * 2;
                         }
-                        else {
+                        else
+                        {
                             radius = (Int32.Parse(elements[6]) * 2) + (4 - ((Int32.Parse(elements[6]) * 2) % 4));
                         }
                         float jejari = radius / 2;
                         int x = Convert.ToInt32(Int32.Parse(elements[4]) - jejari);
                         int y = Convert.ToInt32(1024 - Int32.Parse(elements[5]) - jejari);
-
-                        Image<Gray, double> newImage = My_Image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>();
-
-                        container.Add(elements[0]);                 // File name
-                        container.Add(newImage);                    // Image
-                        container.Add(elements[2]);                 // Calsification
+                        Matrix<double> localEnergy = new Matrix<double>(radius, radius);
+                        Image<Gray, int> im = My_Image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, int>();
+                        Matrix<int> newImage = new Matrix<int>(radius, radius);
+                        im.CopyTo(newImage);
+                        container.Add(elements[0]);                                // File name
+                        container.Add(newImage);                                    // Image
+                        container.Add(elements[3]);                                // Calsification
                         result.Add(container);
-
+                        localEnergy.Dispose();
                         int percentComplete = (int)((float)i / (float)totalImageCount * 100);
 
                         if (percentComplete > highestPercentageReached)
@@ -285,11 +298,13 @@ namespace TugasAkhir
                 // succeeded.
                 roiImage = (ArrayList)e.Result;
 
-                foreach (ArrayList container in roiImage) {
+                foreach (ArrayList container in roiImage)
+                {
                     classes.Add(container[2].ToString());
                 }
 
                 Console.WriteLine(roiImage.Count);
+                metroButton5.Enabled = true;
                 metroButton6.Enabled = true;
             }
         }
@@ -301,20 +316,28 @@ namespace TugasAkhir
             backgroundWorker3.WorkerSupportsCancellation = true;
             backgroundWorker3.WorkerReportsProgress = true;
             backgroundWorker3.RunWorkerAsync();
+
+            this.metroButton6.Enabled = false;
         }
 
         // Fungsi ekstraksi fitur
         List<Matrix<float>> extractFeature(ArrayList roiImage, BackgroundWorker worker, DoWorkEventArgs e) {
-            int totalImageCount = roiImage.Count;
+            int totalImageCount = roiImage.Count + 10;
             int i = 1;
             int highestPercentageReached = 0;
-            List<Matrix<float>> leshFeatures = new List<Matrix<float>>();
+            List<Matrix<float>> GLCMFeatures = new List<Matrix<float>>();
 
-            LESH leshExtractor = new LESH();
-            foreach (ArrayList container in roiImage) {
-                Image<Gray, double> im = (Image<Gray, double>)container[1];
-                Matrix<float> leshFeature = leshExtractor.calc_LESH(im);
-                leshFeatures.Add(leshFeature);
+            GLCM GLCMExtractor = new GLCM();
+            foreach (ArrayList container in roiImage)
+            {
+                Matrix<int> im = (Matrix<int>)container[1];
+                Matrix<float> leshFeature = GLCMExtractor.calc_GLCM(im, 90);
+                Console.WriteLine(container[0].ToString());
+                for (int j = 0; j < leshFeature.Cols; j++)
+                {
+                    Console.WriteLine(leshFeature.Data[0, j].ToString("G9"));
+                }
+                GLCMFeatures.Add(leshFeature);
 
                 int percentComplete = (int)((float)i / (float)totalImageCount * 100);
 
@@ -326,7 +349,10 @@ namespace TugasAkhir
                 i++;
             }
 
-            return leshFeatures;
+            DBConnect database = new DBConnect();
+            database.Insert(GLCMFeatures);
+            worker.ReportProgress(100);
+            return GLCMFeatures;
         }
 
         // Thread ekstraksi fitur
@@ -361,6 +387,7 @@ namespace TugasAkhir
                 featureList = (List<Matrix<float>>)e.Result;
 
                 Console.WriteLine(featureList.Count);
+                metroButton6.Enabled = true;
                 metroButton7.Enabled = true;
             }
         }
@@ -382,68 +409,67 @@ namespace TugasAkhir
 
         // Fungsi untuk melatih SVM
         SVM trainSVM(List<Matrix<float>> samples, List<string> classes, BackgroundWorker worker, DoWorkEventArgs e) {
-            int count = 0;
 
             // Initialize Sample
             Matrix<float> data = new Matrix<float>(samples.Count, samples[0].Cols);
-            foreach (Matrix<float> sample in samples) {
-                for (int cols = 0; cols < sample.Cols; cols++) {
-                    data.Data[count, cols] = Convert.ToSingle(sample.Data[0, cols]);
+            int count = 0;
+            foreach (Matrix<float> sample in samples)
+            {
+                for (int cols = 0; cols < sample.Cols; cols++)
+                {
+                    data.Data[count, cols] = sample.Data[0, cols];
                 }
                 count++;
+            }
+
+            for (int i = 0; i < data.Cols; i++)
+            {
+                Matrix<float> dimention = data.GetCol(i);
+                MCvScalar mean = new MCvScalar();
+                MCvScalar std = new MCvScalar();
+                CvInvoke.MeanStdDev(dimention, ref mean, ref std);
+                dimention = (dimention - mean.V0) / std.V0;
+                for (int j = 0; j < data.Rows; j++)
+                {
+                    data.Data[j, i] = dimention.Data[j, 0];
+                }
             }
 
             // Initialize response
             Matrix<int> response = new Matrix<int>(classes.Count, 1);
-            
+
             count = 0;
-            foreach (string kelas in classes) {
+            foreach (string kelas in classes)
+            {
                 //Console.WriteLine(kelas);
-                switch (kelas) {
-                    case "CALC":
-                        response.Data[count, 0] = 0;
-                        break;
-                    case "CIRC":
+                switch (kelas)
+                {
+                    case "M":
                         response.Data[count, 0] = 1;
                         break;
-                    case "SPIC":
-                        response.Data[count, 0] = 2;
-                        break;
-                    case "MISC":
-                        response.Data[count, 0] = 3;
-                        break;
-                    case "ARCH":
-                        response.Data[count, 0] = 4;
-                        break;
-                    case "ASYM":
-                        response.Data[count, 0] = 5;
+                    case "B":
+                        response.Data[count, 0] = 0;
                         break;
                 }
                 count++;
             }
-            /*for (int i = 0; i < response.Rows; i++)
-            {
-                Console.WriteLine("[" + (i + 1) + "] = " + response.Data[i, 0]);
-            }*/
 
             // Initialize SVM
             SVM model = new SVM();
             model.Type = SVM.SvmType.CSvc;
-            model.SetKernel(SVM.SvmKernelType.Poly);
-            model.TermCriteria = new MCvTermCriteria(100, 0.00001);
-            model.Degree = 1;
+            model.SetKernel(SVM.SvmKernelType.Rbf);
+            model.TermCriteria = new MCvTermCriteria(10000000, 0.0000001);
+            //model.Degree = 3;
             model.C = 1;
-            model.Coef0 = 1;
+            //model.Coef0 = 1;
             model.Gamma = 1;
 
             // Initialize TrainData
             //Matrix<int> respon = responses[j];
             TrainData trainData = new TrainData(data, Emgu.CV.ML.MlEnum.DataLayoutType.RowSample, response);
 
-            bool training = model.TrainAuto(trainData, 4);
+            bool training = model.Train(trainData);
             Console.WriteLine(training);
-            float hasil = model.Predict(data.GetRow(35));
-            Console.WriteLine(response.Data[35,0] + " " + hasil);
             worker.ReportProgress(100);
 
             return model;

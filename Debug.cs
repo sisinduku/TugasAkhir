@@ -536,10 +536,8 @@ namespace TugasAkhir
                 model.Type = SVM.SvmType.CSvc;
                 model.SetKernel(SVM.SvmKernelType.Rbf);
                 model.TermCriteria = new MCvTermCriteria(10000000, 0.0000001);
-                //model.Degree = 3;
-                model.C = Convert.ToDouble(textBox2.Text);
-                //model.Coef0 = 1;
-                model.Gamma = Convert.ToDouble(textBox1.Text);
+                model.Gamma = 2;
+                model.C = 2;
 
                 // Initialize TrainData
                 //Matrix<int> respon = responses[j];
@@ -561,7 +559,7 @@ namespace TugasAkhir
                 //double c = model.C;
                 //Console.WriteLine(c);
                 Console.WriteLine(((float)acc / (float)testingFold.Rows) * 100);
-                result += (((float)acc / (float)testingFold.Rows) * 100).ToString() + Environment.NewLine;
+                result += "Fold ke-" + (fold+1) + " = " + (((float)acc / (float)testingFold.Rows) * 100).ToString() + Environment.NewLine;
                 int percentComplete = (int)(((float)(fold + 1) / (float)10) * 100);
 
                 if (percentComplete > highestPercentageReached)
@@ -573,7 +571,7 @@ namespace TugasAkhir
             }
             akurasi /= 10;
             Console.WriteLine(akurasi);
-            result += akurasi.ToString() + Environment.NewLine;
+            result += "Akurasi Rata-Rata: " + akurasi.ToString() + Environment.NewLine;
             Console.WriteLine(result);
             return result;
         }
