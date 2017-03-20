@@ -322,7 +322,7 @@ namespace TugasAkhir
 
         // Fungsi ekstraksi fitur
         List<Matrix<float>> extractFeature(ArrayList roiImage, BackgroundWorker worker, DoWorkEventArgs e) {
-            int totalImageCount = roiImage.Count + 10;
+            int totalImageCount = roiImage.Count;
             int i = 1;
             int highestPercentageReached = 0;
             List<Matrix<float>> GLCMFeatures = new List<Matrix<float>>();
@@ -331,7 +331,7 @@ namespace TugasAkhir
             foreach (ArrayList container in roiImage)
             {
                 Matrix<int> im = (Matrix<int>)container[1];
-                Matrix<float> leshFeature = GLCMExtractor.calc_GLCM(im, 90);
+                Matrix<float> leshFeature = GLCMExtractor.featureGLCM(im);
                 Console.WriteLine(container[0].ToString());
                 for (int j = 0; j < leshFeature.Cols; j++)
                 {
@@ -349,9 +349,9 @@ namespace TugasAkhir
                 i++;
             }
 
-            DBConnect database = new DBConnect();
-            database.Insert(GLCMFeatures);
-            worker.ReportProgress(100);
+            //DBConnect database = new DBConnect();
+            //database.Insert(GLCMFeatures);
+            //worker.ReportProgress(100);
             return GLCMFeatures;
         }
 

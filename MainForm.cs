@@ -38,7 +38,7 @@ namespace TugasAkhir
             int x = Convert.ToInt32(461 - jejari);
             int y = Convert.ToInt32(1024 - 532 - jejari);
             //imageBox1.Image = CLAHEImage;
-            imageBox1.Image = CLAHEImage.Copy(new Rectangle(x, y, radius, radius));
+            //imageBox1.Image = CLAHEImage.Copy(new Rectangle(x, y, radius, radius));
             //Matrix<double> img = new Matrix<double>(radius, radius);
             //image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>().CopyTo(img);
             

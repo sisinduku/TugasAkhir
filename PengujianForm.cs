@@ -445,8 +445,8 @@ namespace TugasAkhir
         // Fungsi untuk klasifikasi
         string klasifikasi(List<Matrix<float>> samples, BackgroundWorker worker, DoWorkEventArgs e) {
             worker.ReportProgress(0);
-            DBConnect database = new DBConnect();
-            Matrix<float> dataPelatihan = database.Select();
+            //DBConnect database = new DBConnect();
+            //Matrix<float> dataPelatihan = database.Select();
 
             // Initialize Sample
             Matrix<float> data = new Matrix<float>(samples.Count, samples[0].Cols);

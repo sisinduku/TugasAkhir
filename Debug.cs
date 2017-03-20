@@ -570,7 +570,6 @@ namespace TugasAkhir
 
             }
             akurasi /= 10;
-            Console.WriteLine(akurasi);
             result += "Akurasi Rata-Rata: " + akurasi.ToString() + Environment.NewLine;
             Console.WriteLine(result);
             return result;
