@@ -227,6 +227,8 @@ namespace TugasAkhir
             int i = 1;
             int highestPercentageReached = 0;
 
+            PhaseCong2 phaseCongruency = new PhaseCong2();
+
             System.IO.StreamReader file =
                 new System.IO.StreamReader(paths);
 
@@ -258,13 +260,27 @@ namespace TugasAkhir
                         float jejari = radius / 2;
                         int x = Convert.ToInt32(Int32.Parse(elements[4]) - jejari);
                         int y = Convert.ToInt32(1024 - Int32.Parse(elements[5]) - jejari);
+                        Matrix<double> or = new Matrix<double>(radius, radius);
+                        List<Matrix<double>> PC = new List<Matrix<double>>();
                         Matrix<double> localEnergy = new Matrix<double>(radius, radius);
-                        Image<Gray, int> im = My_Image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, int>();
-                        Matrix<int> newImage = new Matrix<int>(radius, radius);
-                        im.CopyTo(newImage);
+                        //Image<Gray, double> newImage = My_Image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>();
+                        phaseCongruency.calcPhaseCong2(My_Image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>(), PC, or);
+                        or.Dispose();
+                        for (int ort = 0; ort < PC.Count; ort++)
+                        {
+                            localEnergy += PC[ort];
+                        }
+                        using (Matrix<double> tempShapeVect = localEnergy.Clone())
+                        {
+                            double max = 0, min = 0;
+                            Point x0 = new Point();
+                            Point y0 = new Point();
+                            CvInvoke.MinMaxLoc(tempShapeVect, ref min, ref max, ref x0, ref y0);
+                            localEnergy = (tempShapeVect - min) * 255 / (max - min);
+                        }
                         container.Add(elements[0]);                                // File name
-                        container.Add(newImage);                                    // Image
-                        container.Add(elements[3]);                                // Calsification
+                        container.Add(localEnergy.Clone().Convert<int>());         // Image
+                        container.Add(elements[2]);                                // Calsification
                         result.Add(container);
                         localEnergy.Dispose();
                         int percentComplete = (int)((float)i / (float)totalImageCount * 100);
