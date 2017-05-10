@@ -270,6 +270,7 @@ namespace TugasAkhir
                         Console.WriteLine(elements[0]);
                         Image<Gray, byte> My_Image = (Image<Gray, byte>)listImage[elements[0]];
                         int radius = 0;
+                        // Mengambil radius di dibuat untuk habis dibagi 4 (Kebutuhan LESH)
                         if ((Int32.Parse(elements[6]) * 2) % 4 == 0) {
                             radius = Int32.Parse(elements[6]) * 2;
                         }

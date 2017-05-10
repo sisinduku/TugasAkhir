@@ -31,24 +31,7 @@ namespace TugasAkhir
 
         private void Debug_Load(object sender, EventArgs e)
         {
-            /*Image<Gray, byte> image = new Image<Gray, byte>(@"E:\Data\Project\TA\Diagnosa kanker payudara dengan SVM dan ekstraksi fitur LESH\core\all-mias\mdb256.pgm");
-            Image<Gray, byte> CLAHEImage = image.Copy();
-            int radius = 37 * 2;
-            float jejari = radius / 2;
-            int x = Convert.ToInt32(400 - jejari);
-            int y = Convert.ToInt32(1024 - 484 - jejari);
-            CvInvoke.MedianBlur(image.Copy(), image, 3);
-            Image<Gray, byte> before = image.Clone();
-            Image<Gray, byte> temp1 = image.Clone();
-            Image<Gray, byte> smoothed = image.Clone();
-            CvInvoke.GaussianBlur(image.Clone(), temp1, new Size(0, 0), 2);
-            CvInvoke.GaussianBlur(temp1.Clone(), smoothed, new Size(0, 0), 2);
-            CvInvoke.AddWeighted(image.Clone(), 1.5, smoothed, -0.5, 0, image);
-            CvInvoke.CLAHE(image.Clone(), 3.56, new Size(8, 8), image);
-            imageBox1.Image = CLAHEImage.Copy(new Rectangle(x, y, radius, radius));
-            CLAHEImage = Preprocessing.enhanceImage(CLAHEImage);
-            imageBox2.Image = CLAHEImage.Copy(new Rectangle(x, y, radius, radius));
-            */
+            
         }
 
         private void imageBox1_Click(object sender, EventArgs e)
@@ -248,6 +231,7 @@ namespace TugasAkhir
                         Console.WriteLine(elements[0]);
                         Image<Gray, byte> My_Image = (Image<Gray, byte>)listImage[elements[0]];
                         int radius = 0;
+                        // Mengambil radius di dibuat untuk habis dibagi 4 (Kebutuhan LESH)
                         if ((Int32.Parse(elements[6]) * 2) % 4 == 0)
                         {
                             radius = Int32.Parse(elements[6]) * 2;
@@ -263,20 +247,6 @@ namespace TugasAkhir
                         Matrix<double> or = new Matrix<double>(radius, radius);
                         Matrix<double> localEnergy = new Matrix<double>(radius, radius);*/
                         Image<Gray, double> newImage = My_Image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>();
-                        /*phasecong.calcPhaseCong2(newImage, pc, or);
-                        or.Dispose();
-                        for (int ort = 0; ort < pc.Count; ort++)
-                        {
-                            localEnergy += pc[ort];
-                        }
-                        using (Matrix<double> tempShapeVect = localEnergy.Clone())
-                        {
-                            double max = 0, min = 0;
-                            Point x0 = new Point();
-                            Point y0 = new Point();
-                            CvInvoke.MinMaxLoc(tempShapeVect, ref min, ref max, ref x0, ref y0);
-                            localEnergy = (tempShapeVect - min) * 255 / (max - min);
-                        }*/
                         container.Add(elements[0]);                 // File name
                         container.Add(newImage);                    // Image                        
                         container.Add(elements[3]);                 // Calsification
@@ -457,19 +427,7 @@ namespace TugasAkhir
                 }
                 count++;
             }
-
-            /*for (int i = 0; i < data.Cols; i++) {
-                Matrix<float> dimention = data.GetCol(i);
-                MCvScalar mean = new MCvScalar();
-                MCvScalar std = new MCvScalar();
-                CvInvoke.MeanStdDev(dimention, ref mean, ref std);
-
-                dimention = (dimention - mean.V0) / std.V0;
-                for (int j = 0; j < data.Rows; j++) {
-                    data.Data[j, i] = dimention.Data[j, 0];
-                }
-            }*/
-
+            
             // Initialize response
             Matrix<int> response = new Matrix<int>(classes.Count, 1);
 
