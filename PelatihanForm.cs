@@ -233,6 +233,7 @@ namespace TugasAkhir
                         Console.WriteLine(elements[0]);
                         Image<Gray, byte> My_Image = (Image<Gray, byte>)listImage[elements[0]];
                         int radius = 0;
+                        // Mengambil radius di dibuat untuk habis dibagi 4 (Kebutuhan LESH)
                         if ((Int32.Parse(elements[6]) * 2) % 4 == 0)
                         {
                             radius = Int32.Parse(elements[6]) * 2;
@@ -244,7 +245,6 @@ namespace TugasAkhir
                         float jejari = radius / 2;
                         int x = Convert.ToInt32(Int32.Parse(elements[4]) - jejari);
                         int y = Convert.ToInt32(1024 - Int32.Parse(elements[5]) - jejari);
-                        Matrix<double> localEnergy = new Matrix<double>(radius, radius);
                         Image<Gray, int> im = My_Image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, int>();
                         Matrix<int> newImage = new Matrix<int>(radius, radius);
                         im.CopyTo(newImage);
@@ -252,7 +252,6 @@ namespace TugasAkhir
                         container.Add(newImage);                                    // Image
                         container.Add(elements[3]);                                // Calsification
                         result.Add(container);
-                        localEnergy.Dispose();
                         int percentComplete = (int)((float)i / (float)totalImageCount * 100);
 
                         if (percentComplete > highestPercentageReached)
@@ -422,6 +421,7 @@ namespace TugasAkhir
                 count++;
             }
 
+            // Standardisasi nilai
             for (int i = 0; i < data.Cols; i++)
             {
                 Matrix<float> dimention = data.GetCol(i);
