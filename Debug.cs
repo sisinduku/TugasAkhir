@@ -263,11 +263,13 @@ namespace TugasAkhir
                         Matrix<double> or = new Matrix<double>(radius, radius);
                         Matrix<double> localEnergy = new Matrix<double>(radius, radius);
                         Image<Gray, double> newImage = My_Image.Copy(new Rectangle(x, y, radius, radius)).Convert<Gray, double>();
+                        // Menghitung lokal energi
                         phasecong.calcPhaseCong2(newImage.Clone(), pc, or);
                         for (int ort = 0; ort < pc.Count; ort++)
                         {
                             localEnergy += pc[ort];
                         }
+                        // Normalisasi nilai lokal energi
                         using (Matrix<double> tempShapeVect = localEnergy.Clone())
                         {
                             double max = 0, min = 0;
@@ -373,7 +375,10 @@ namespace TugasAkhir
             {
                 List<Matrix<double>> pc = (List<Matrix<double>>)container[1];
                 Matrix<int> localEnergy = (Matrix<int>)container[3];
+                // Mengambil fitur lesh
                 Matrix<float> leshFeature = leshExtractor.calcLESHFromPC(pc);
+
+                // Mengambil fitur glcm berdasarkan citra lokal energi
                 Matrix<float> glcmFeature = glcmExtractor.featureGLCM(localEnergy);
 
                 features.Add(leshFeature.ConcateHorizontal(glcmFeature));
